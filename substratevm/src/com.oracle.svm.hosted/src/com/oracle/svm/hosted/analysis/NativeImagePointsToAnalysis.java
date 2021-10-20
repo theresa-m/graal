@@ -42,8 +42,6 @@ import org.graalvm.compiler.graph.NodeSourcePosition;
 import org.graalvm.compiler.options.OptionValues;
 import org.graalvm.word.WordBase;
 
-import com.oracle.graal.pointsto.ObjectScanner;
-import com.oracle.graal.pointsto.ObjectScanner.ScanReason;
 import com.oracle.graal.pointsto.PointsToAnalysis;
 import com.oracle.graal.pointsto.constraints.UnsupportedFeatures;
 import com.oracle.graal.pointsto.flow.MethodTypeFlow;
@@ -59,14 +57,12 @@ import com.oracle.svm.core.SubstrateOptions;
 import com.oracle.svm.core.annotate.UnknownObjectField;
 import com.oracle.svm.core.annotate.UnknownPrimitiveField;
 import com.oracle.svm.core.graal.meta.SubstrateReplacements;
-import com.oracle.svm.core.meta.SubstrateObjectConstant;
 import com.oracle.svm.core.util.UserError;
 import com.oracle.svm.hosted.HostedConfiguration;
 import com.oracle.svm.hosted.SVMHost;
 import com.oracle.svm.hosted.meta.HostedType;
 import com.oracle.svm.hosted.substitute.AnnotationSubstitutionProcessor;
 
-import jdk.vm.ci.meta.JavaConstant;
 import jdk.vm.ci.meta.JavaKind;
 import jdk.vm.ci.meta.ResolvedJavaType;
 
@@ -76,11 +72,10 @@ public class NativeImagePointsToAnalysis extends PointsToAnalysis implements Inf
     private final Pattern illegalCalleesPattern;
     private final Pattern targetCallersPattern;
     private final AnnotationSubstitutionProcessor annotationSubstitutionProcessor;
-    private final DynamicHubInitializer dynamicHubInitializer;
 
     public NativeImagePointsToAnalysis(OptionValues options, AnalysisUniverse universe, HostedProviders providers, AnnotationSubstitutionProcessor annotationSubstitutionProcessor,
                     ForkJoinPool executor, Runnable heartbeatCallback, UnsupportedFeatures unsupportedFeatures) {
-        super(options, universe, providers, universe.hostVM(), executor, heartbeatCallback, new SubstrateUnsupportedFeatures(), SubstrateOptions.parseOnce());
+        super(options, universe, providers, universe.hostVM(), executor, heartbeatCallback, unsupportedFeatures, SubstrateOptions.parseOnce());
         this.annotationSubstitutionProcessor = annotationSubstitutionProcessor;
 
         String[] targetCallers = new String[]{"com\\.oracle\\.graal\\.", "org\\.graalvm[^\\.polyglot\\.nativeapi]"};
@@ -90,21 +85,11 @@ public class NativeImagePointsToAnalysis extends PointsToAnalysis implements Inf
         illegalCalleesPattern = buildPrefixMatchPattern(illegalCallees);
 
         handledUnknownValueFields = new HashSet<>();
-        dynamicHubInitializer = new DynamicHubInitializer(universe, metaAccess, unsupportedFeatures, providers.getConstantReflection());
     }
 
     @Override
     public MethodTypeFlowBuilder createMethodTypeFlowBuilder(PointsToAnalysis bb, MethodTypeFlow methodFlow) {
         return HostedConfiguration.instance().createMethodTypeFlowBuilder(bb, methodFlow);
-    }
-
-    @Override
-    protected void checkObjectGraph(ObjectScanner objectScanner) {
-        universe.getFields().forEach(this::handleUnknownValueField);
-        universe.getTypes().stream().filter(AnalysisType::isReachable).forEach(dynamicHubInitializer::initializeMetaData);
-
-        /* Scan hubs of all types that end up in the native image. */
-        universe.getTypes().stream().filter(AnalysisType::isReachable).forEach(type -> scanHub(objectScanner, type));
     }
 
     @Override
@@ -137,13 +122,8 @@ public class NativeImagePointsToAnalysis extends PointsToAnalysis implements Inf
         return annotationSubstitutionProcessor;
     }
 
-    private void scanHub(ObjectScanner objectScanner, AnalysisType type) {
-        SVMHost svmHost = (SVMHost) hostVM;
-        JavaConstant hubConstant = SubstrateObjectConstant.forObject(svmHost.dynamicHub(type));
-        objectScanner.scanConstant(hubConstant, ScanReason.HUB);
-    }
-
-    private void handleUnknownValueField(AnalysisField field) {
+    @Override
+    public void handleUnknownValueField(AnalysisField field) {
         if (handledUnknownValueFields.contains(field)) {
             return;
         }

@@ -849,12 +849,14 @@ public class AnnotationSubstitutionProcessor extends SubstitutionProcessor {
         String targetName = "";
         boolean isFinal = original.isFinal() && annotated.isFinal();
         boolean disableCaching = false;
+        boolean isValidForAnalysis = true;
 
         if (recomputeAnnotation != null) {
             kind = recomputeAnnotation.kind();
             targetName = recomputeAnnotation.name();
             isFinal = recomputeAnnotation.isFinal();
             disableCaching = recomputeAnnotation.disableCaching();
+            isValidForAnalysis = recomputeAnnotation.isValidForAnalysis();
             guarantee(!isFinal || ComputedValueField.isFinalValid(kind), "@%s with %s can never be final during analysis: unset isFinal in the annotation on %s",
                             RecomputeFieldValue.class.getSimpleName(), kind, annotated);
             guarantee(!isFinal || !disableCaching, "@%s can not be final if caching is disabled: unset isFinal in the annotation on %s",
@@ -866,7 +868,7 @@ public class AnnotationSubstitutionProcessor extends SubstitutionProcessor {
                 targetClass = imageClassLoader.findClassOrFail(recomputeAnnotation.declClassName());
             }
         }
-        return new ComputedValueField(original, annotated, kind, targetClass, targetName, isFinal, disableCaching);
+        return new ComputedValueField(original, annotated, kind, targetClass, targetName, isFinal, disableCaching, isValidForAnalysis);
     }
 
     private void reinitializeField(Field annotatedField) {

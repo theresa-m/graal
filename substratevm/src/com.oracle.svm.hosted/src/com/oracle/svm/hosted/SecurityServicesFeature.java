@@ -191,7 +191,10 @@ public class SecurityServicesFeature extends JNIRegistrationUtil implements Feat
     /** List of providers deemed not to be used by this feature. */
     private List<Provider> removedProviders;
 
-    private boolean shouldFilterProviders = true;
+    // TODO Filtering temporarily disabled see
+    // com.oracle.svm.core.jdk.Target_sun_security_jca_Providers.providerList for details.
+    // private boolean shouldFilterProviders = true;
+    private boolean shouldFilterProviders = false;
 
     @Override
     public void afterRegistration(AfterRegistrationAccess a) {
@@ -365,8 +368,9 @@ public class SecurityServicesFeature extends JNIRegistrationUtil implements Feat
                     removedProviders.removeIf(provider -> !shouldRemoveProvider(provider));
                 }
             }
+            return filteredProviderList;
         }
-        return filteredProviderList;
+        return providerList;
     }
 
     private void traceRemovedProviders() {

@@ -304,10 +304,10 @@ final class Target_org_graalvm_compiler_lir_phases_LIRPhase {
 @TargetClass(value = org.graalvm.compiler.graph.NodeClass.class, onlyWith = GraalFeature.IsEnabled.class)
 final class Target_org_graalvm_compiler_graph_NodeClass {
 
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Custom, declClass = FieldsOffsetsFeature.InputsIterationMaskRecomputation.class)//
+    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Custom, isValidForAnalysis = false, declClass = FieldsOffsetsFeature.InputsIterationMaskRecomputation.class)//
     private long inputsIteration;
 
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Custom, declClass = FieldsOffsetsFeature.SuccessorsIterationMaskRecomputation.class)//
+    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Custom, isValidForAnalysis = false, declClass = FieldsOffsetsFeature.SuccessorsIterationMaskRecomputation.class)//
     private long successorIteration;
 
     @Substitute

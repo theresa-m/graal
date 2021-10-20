@@ -132,12 +132,15 @@ import org.graalvm.nativeimage.impl.SizeOfSupport;
 import org.graalvm.nativeimage.impl.clinit.ClassInitializationTracking;
 import org.graalvm.word.PointerBase;
 
+import com.oracle.graal.pointsto.AnalysisObjectScanningObserver;
 import com.oracle.graal.pointsto.AnalysisPolicy;
 import com.oracle.graal.pointsto.BigBang;
 import com.oracle.graal.pointsto.BytecodeSensitiveAnalysisPolicy;
 import com.oracle.graal.pointsto.DefaultAnalysisPolicy;
 import com.oracle.graal.pointsto.api.PointstoOptions;
 import com.oracle.graal.pointsto.constraints.UnsupportedFeatureException;
+import com.oracle.graal.pointsto.heap.ImageHeap;
+import com.oracle.graal.pointsto.heap.ImageHeapScanner;
 import com.oracle.graal.pointsto.infrastructure.SubstitutionProcessor;
 import com.oracle.graal.pointsto.infrastructure.WrappedJavaMethod;
 import com.oracle.graal.pointsto.meta.AnalysisField;
@@ -203,7 +206,6 @@ import com.oracle.svm.core.heap.RestrictHeapAccessCallees;
 import com.oracle.svm.core.hub.DynamicHub;
 import com.oracle.svm.core.hub.LayoutEncoding;
 import com.oracle.svm.core.image.ImageHeapLayouter;
-import com.oracle.svm.hosted.jdk.localization.LocalizationFeature;
 import com.oracle.svm.core.option.HostedOptionValues;
 import com.oracle.svm.core.option.OptionUtils;
 import com.oracle.svm.core.option.RuntimeOptionValues;
@@ -229,6 +231,7 @@ import com.oracle.svm.hosted.analysis.Inflation;
 import com.oracle.svm.hosted.analysis.NativeImagePointsToAnalysis;
 import com.oracle.svm.hosted.analysis.SVMAnalysisMetaAccess;
 import com.oracle.svm.hosted.analysis.SubstrateUnsupportedFeatures;
+import com.oracle.svm.hosted.analysis.heap.SVMImageHeapScanner;
 import com.oracle.svm.hosted.annotation.AnnotationSupport;
 import com.oracle.svm.hosted.c.CAnnotationProcessorCache;
 import com.oracle.svm.hosted.c.CConstantValueSupportImpl;
@@ -254,6 +257,7 @@ import com.oracle.svm.hosted.image.AbstractImage.NativeImageKind;
 import com.oracle.svm.hosted.image.NativeImageCodeCache;
 import com.oracle.svm.hosted.image.NativeImageCodeCacheFactory;
 import com.oracle.svm.hosted.image.NativeImageHeap;
+import com.oracle.svm.hosted.jdk.localization.LocalizationFeature;
 import com.oracle.svm.hosted.meta.HostedField;
 import com.oracle.svm.hosted.meta.HostedInterface;
 import com.oracle.svm.hosted.meta.HostedMetaAccess;
@@ -542,6 +546,7 @@ public class NativeImageGenerator {
             try (StopTimer t = new Timer(imageName, "universe").start()) {
                 hUniverse = new HostedUniverse(bb);
                 hMetaAccess = new HostedMetaAccess(hUniverse, bb.getMetaAccess());
+                ((SVMImageHeapScanner) aUniverse.getHeapScanner()).setHostedMetaAccess(hMetaAccess);
 
                 BeforeUniverseBuildingAccessImpl beforeUniverseBuildingConfig = new BeforeUniverseBuildingAccessImpl(featureHandler, loader, debug, hMetaAccess);
                 featureHandler.forEachFeature(feature -> feature.beforeUniverseBuilding(beforeUniverseBuildingConfig));
@@ -828,6 +833,13 @@ public class NativeImageGenerator {
                 bb = createBigBang(options, target, aUniverse, analysisExecutor, watchdog::recordActivity, aMetaAccess, aConstantReflection, aWordTypes, aSnippetReflection,
                                 annotationSubstitutions, aForeignCalls, classInitializationSupport, originalProviders);
                 aUniverse.setBigBang(bb);
+
+                /* Create the HeapScanner and install it into the universe. */
+                ImageHeap imageHeap = new ImageHeap();
+                AnalysisObjectScanningObserver aScanningObserver = new AnalysisObjectScanningObserver(bb);
+                ImageHeapScanner heapScanner = new SVMImageHeapScanner(imageHeap, aUniverse, aMetaAccess, aSnippetReflection, aConstantReflection, aScanningObserver, bb.getUnsupportedFeatures());
+                aUniverse.setHeapScanner(heapScanner);
+
                 /* Register already created types as assignable. */
                 aUniverse.getTypes().forEach(t -> t.registerAsAssignable(bb));
 
@@ -989,7 +1001,7 @@ public class NativeImageGenerator {
                     ClassInitializationSupport classInitializationSupport, Providers originalProviders) {
         assert aUniverse != null : "Analysis universe must be initialized.";
         aMetaAccess.lookupJavaType(String.class).registerAsReachable();
-        AnalysisConstantFieldProvider aConstantFieldProvider = new AnalysisConstantFieldProvider(aUniverse, aMetaAccess, aConstantReflection, classInitializationSupport);
+        AnalysisConstantFieldProvider aConstantFieldProvider = new AnalysisConstantFieldProvider(aUniverse, aMetaAccess, classInitializationSupport);
         /*
          * Install all snippets so that the types, methods, and fields used in the snippets get
          * added to the universe.
@@ -1445,7 +1457,7 @@ public class NativeImageGenerator {
 
         if (SubstrateOptions.VerifyNamingConventions.getValue()) {
             for (AnalysisMethod method : aUniverse.getMethods()) {
-                if ((method.isInvoked() || method.isReachable()) && method.getAnnotation(Fold.class) == null) {
+                if ((method.isInvoked() || method.isImplementationInvoked()) && method.getAnnotation(Fold.class) == null) {
                     checkName(method.format("%H.%n(%p)"), method);
                 }
             }

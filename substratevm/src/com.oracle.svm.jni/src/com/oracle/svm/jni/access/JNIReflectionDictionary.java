@@ -37,6 +37,7 @@ import org.graalvm.nativeimage.CurrentIsolate;
 import org.graalvm.nativeimage.ImageSingletons;
 import org.graalvm.nativeimage.Platform.HOSTED_ONLY;
 import org.graalvm.nativeimage.Platforms;
+import org.graalvm.nativeimage.hosted.Feature;
 import org.graalvm.word.Pointer;
 import org.graalvm.word.SignedWord;
 import org.graalvm.word.UnsignedWord;
@@ -108,18 +109,22 @@ public final class JNIReflectionDictionary {
     }
 
     @Platforms(HOSTED_ONLY.class)
-    JNIAccessibleClass addClassIfAbsent(Class<?> classObj, Function<Class<?>, JNIAccessibleClass> mappingFunction) {
+    JNIAccessibleClass addClassIfAbsent(Feature.DuringAnalysisAccess access, Class<?> classObj, Function<Class<?>, JNIAccessibleClass> mappingFunction) {
         if (!classesByClassObject.containsKey(classObj)) {
             JNIAccessibleClass instance = mappingFunction.apply(classObj);
             classesByClassObject.put(classObj, instance);
             classesByName.put(instance.getInternalName(), instance);
+            access.rescanObject(classesByClassObject);
+            access.rescanObject(classesByName);
+            access.rescanObject(this);
         }
         return classesByClassObject.get(classObj);
     }
 
     @Platforms(HOSTED_ONLY.class)
-    void addLinkages(Map<JNINativeLinkage, JNINativeLinkage> linkages) {
+    void addLinkages(Feature.DuringAnalysisAccess access, Map<JNINativeLinkage, JNINativeLinkage> linkages) {
         nativeLinkages.putAll(EconomicMap.wrapMap(linkages));
+        access.rescanObject(nativeLinkages);
     }
 
     public Iterable<JNIAccessibleClass> getClasses() {

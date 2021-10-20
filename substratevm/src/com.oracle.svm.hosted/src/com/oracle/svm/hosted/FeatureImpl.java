@@ -245,6 +245,10 @@ public class FeatureImpl {
         Set<AnalysisMethod> reachableMethodOverrides(AnalysisMethod baseMethod) {
             return AnalysisUniverse.getMethodImplementations(getBigBang(), baseMethod, true);
         }
+
+        public void rescanObject(Object obj) {
+            getUniverse().getHeapScanner().rescanObject(obj);
+        }
     }
 
     public static class DuringSetupAccessImpl extends AnalysisAccessBase implements Feature.DuringSetupAccess {

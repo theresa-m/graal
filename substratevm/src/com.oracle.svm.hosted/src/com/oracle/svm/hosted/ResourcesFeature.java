@@ -233,6 +233,7 @@ public final class ResourcesFeature implements Feature {
         });
 
         resourcePatternWorkSet.clear();
+        // access.rescanObject(ImageSingletons.lookup(Resources.ResourcesSupport.class).hostedResources);
     }
 
     private static Pattern[] compilePatterns(Set<String> patterns) {

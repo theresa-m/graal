@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.oracle.graal.pointsto.constraints.UnsupportedFeatureException;
 import com.oracle.graal.pointsto.constraints.UnsupportedFeatures;
+import com.oracle.graal.pointsto.heap.ImageHeapScanner;
 import com.oracle.graal.pointsto.meta.AnalysisField;
 import com.oracle.graal.pointsto.meta.AnalysisMetaAccess;
 import com.oracle.graal.pointsto.meta.AnalysisType;
@@ -75,7 +76,7 @@ public class DynamicHubInitializer {
         this.interfacesEncodings = new ConcurrentHashMap<>();
     }
 
-    public void initializeMetaData(AnalysisType type) {
+    public void initializeMetaData(ImageHeapScanner heapScanner, AnalysisType type) {
         assert type.isReachable();
         DynamicHub hub = hostVM.dynamicHub(type);
         if (hub.getGenericInfo() == null) {
@@ -113,7 +114,9 @@ public class DynamicHubInitializer {
                  */
                 Annotation[] annotations = type.getWrappedWithoutResolve().getAnnotations();
                 Annotation[] declared = type.getWrappedWithoutResolve().getDeclaredAnnotations();
-                hub.setAnnotationsEncoding(AnnotationsProcessor.encodeAnnotations(metaAccess, annotations, declared, hub.getAnnotationsEncoding()));
+                Object annotationsEncoding = AnnotationsProcessor.encodeAnnotations(metaAccess, annotations, declared, hub.getAnnotationsEncoding());
+                hub.setAnnotationsEncoding(annotationsEncoding);
+                heapScanner.rescanObject(annotationsEncoding);
             } catch (ArrayStoreException e) {
                 /* If we hit JDK-7183985 just encode the exception. */
                 hub.setAnnotationsEncoding(e);
@@ -164,6 +167,7 @@ public class DynamicHubInitializer {
                         assert enumConstants != null;
                     }
                     hub.initEnumConstants(enumConstants);
+                    heapScanner.rescanObject(enumConstants);
                 }
             }
         }

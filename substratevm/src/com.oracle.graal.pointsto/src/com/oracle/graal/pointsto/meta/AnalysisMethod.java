@@ -76,7 +76,7 @@ import jdk.vm.ci.meta.ResolvedJavaMethod;
 import jdk.vm.ci.meta.ResolvedJavaType;
 import jdk.vm.ci.meta.SpeculationLog;
 
-public class AnalysisMethod implements WrappedJavaMethod, GraphProvider, OriginalMethodProvider {
+public class AnalysisMethod extends ElementInfo implements WrappedJavaMethod, GraphProvider, OriginalMethodProvider {
 
     private final AnalysisUniverse universe;
     public final ResolvedJavaMethod wrapped;

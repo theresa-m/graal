@@ -41,6 +41,14 @@ public interface ReadableJavaField extends ResolvedJavaField {
 
     JavaConstant readValue(MetaAccessProvider metaAccess, JavaConstant receiver);
 
+    default boolean isValueValidForAnalysis() {
+        return true;
+    }
+
+    default boolean isValueAvailable() {
+        return true;
+    }
+
     boolean allowConstantFolding();
 
     boolean injectFinalForRuntimeCompilation();

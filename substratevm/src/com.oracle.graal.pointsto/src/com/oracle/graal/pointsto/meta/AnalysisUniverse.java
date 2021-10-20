@@ -46,6 +46,7 @@ import com.oracle.graal.pointsto.AnalysisPolicy;
 import com.oracle.graal.pointsto.BigBang;
 import com.oracle.graal.pointsto.api.HostVM;
 import com.oracle.graal.pointsto.constraints.UnsupportedFeatureException;
+import com.oracle.graal.pointsto.heap.ImageHeapScanner;
 import com.oracle.graal.pointsto.infrastructure.AnalysisConstantPool;
 import com.oracle.graal.pointsto.infrastructure.SubstitutionProcessor;
 import com.oracle.graal.pointsto.infrastructure.Universe;
@@ -113,6 +114,7 @@ public class AnalysisUniverse implements Universe {
     private AnalysisType objectClass;
     private final JavaKind wordKind;
     private AnalysisPolicy analysisPolicy;
+    private ImageHeapScanner heapScanner;
     private BigBang bb;
 
     public JavaKind getWordKind() {
@@ -484,7 +486,7 @@ public class AnalysisUniverse implements Universe {
         if (constant == null) {
             return null;
         } else if (constant.getJavaKind().isObject() && !constant.isNull()) {
-            return originalSnippetReflection.forObject(getSnippetReflection().asObject(Object.class, constant));
+            return originalSnippetReflection.forObject(snippetReflection.asObject(Object.class, constant));
         } else {
             return constant;
         }
@@ -684,4 +686,13 @@ public class AnalysisUniverse implements Universe {
     public BigBang getBigbang() {
         return bb;
     }
+
+    public void setHeapScanner(ImageHeapScanner heapScanner) {
+        this.heapScanner = heapScanner;
+    }
+
+    public ImageHeapScanner getHeapScanner() {
+        return heapScanner;
+    }
+
 }

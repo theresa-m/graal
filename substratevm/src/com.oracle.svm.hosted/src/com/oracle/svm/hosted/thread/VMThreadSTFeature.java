@@ -212,6 +212,8 @@ public class VMThreadSTFeature implements GraalFeature {
          */
         if (VMThreadLocalInfos.setInfos(threadLocalCollector.threadLocals.values())) {
             access.requireAnalysisIteration();
+            access.rescanObject(ImageSingletons.lookup(VMThreadLocalInfos.class));
+            access.rescanObject(ImageSingletons.lookup(VMThreadLocalInfos.class).getInfos());
         }
     }
 

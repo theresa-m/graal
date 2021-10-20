@@ -32,6 +32,7 @@ import java.util.List;
 
 import org.graalvm.compiler.options.OptionValues;
 
+import com.oracle.graal.pointsto.constraints.UnsupportedFeatureException;
 import com.oracle.graal.pointsto.flow.AbstractSpecialInvokeTypeFlow;
 import com.oracle.graal.pointsto.flow.AbstractVirtualInvokeTypeFlow;
 import com.oracle.graal.pointsto.flow.ActualReturnTypeFlow;
@@ -207,7 +208,13 @@ public class DefaultAnalysisPolicy extends AnalysisPolicy {
                     continue;
                 }
 
-                AnalysisMethod method = type.resolveConcreteMethod(getTargetMethod());
+                AnalysisMethod method = null;
+                try {
+                    method = type.resolveConcreteMethod(targetMethod);
+                } catch (UnsupportedFeatureException ex) {
+                    bb.getUnsupportedFeatures().addMessage("resolve" + targetMethod.format("%H.%n(%p)"), targetMethod, ex.getMessage());
+                }
+
                 if (method == null || Modifier.isAbstract(method.getModifiers())) {
                     /*
                      * Type states can be conservative, i.e., we can have receiver types that do not

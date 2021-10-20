@@ -206,4 +206,10 @@ public @interface RecomputeFieldValue {
      * If true, ignores previously computed values and calculates the value for every field read.
      */
     boolean disableCaching() default false;
+
+    /**
+     * Mark fields that whose value is not valid during analysis, e.g., they depend on other fields
+     * offsets.
+     */
+    boolean isValidForAnalysis() default true;
 }

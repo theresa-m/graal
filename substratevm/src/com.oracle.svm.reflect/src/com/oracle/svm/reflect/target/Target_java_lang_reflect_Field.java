@@ -75,7 +75,7 @@ public final class Target_java_lang_reflect_Field {
     @Alias //
     Target_java_lang_reflect_Field root;
 
-    @Inject @RecomputeFieldValue(kind = Kind.Custom, declClass = FieldOffsetComputer.class) //
+    @Inject @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = FieldOffsetComputer.class) //
     public int offset;
 
     @Inject @RecomputeFieldValue(kind = Kind.Custom, declClass = AnnotatedTypeComputer.class) //

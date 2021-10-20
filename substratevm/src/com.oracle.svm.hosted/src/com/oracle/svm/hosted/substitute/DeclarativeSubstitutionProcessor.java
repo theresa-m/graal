@@ -585,6 +585,11 @@ class FieldDescriptor extends ElementDescriptor {
         public boolean disableCaching() {
             return get("disableCaching", false);
         }
+
+        @Override
+        public boolean isValidForAnalysis() {
+            return get("isValidForAnalysis", true);
+        }
     }
 
     @SuppressWarnings("all")

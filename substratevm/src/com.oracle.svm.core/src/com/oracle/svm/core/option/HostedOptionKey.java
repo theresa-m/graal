@@ -30,6 +30,8 @@ import org.graalvm.collections.EconomicMap;
 import org.graalvm.compiler.api.replacements.Fold;
 import org.graalvm.compiler.options.Option;
 import org.graalvm.compiler.options.OptionKey;
+import org.graalvm.nativeimage.Platform;
+import org.graalvm.nativeimage.Platforms;
 
 /**
  * Defines a hosted {@link Option} that is used during native image generation, in contrast to a
@@ -74,6 +76,7 @@ public class HostedOptionKey<T> extends OptionKey<T> {
     }
 
     @Override
+    @Platforms(Platform.HOSTED_ONLY.class)
     public void update(EconomicMap<OptionKey<?>, Object> values, Object boxedValue) {
         Object defaultValue = getDefaultValue();
         if (defaultValue instanceof MultiOptionValue) {

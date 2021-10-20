@@ -71,6 +71,7 @@ import org.graalvm.nativeimage.hosted.Feature.DuringAnalysisAccess;
 import org.graalvm.word.Pointer;
 import org.graalvm.word.WordFactory;
 
+import com.oracle.svm.core.annotate.UnknownObjectField;
 import com.oracle.svm.core.c.CGlobalData;
 import com.oracle.svm.core.c.CGlobalDataFactory;
 import com.oracle.svm.core.config.ConfigurationValues;
@@ -95,10 +96,10 @@ public class GraalSupport {
     private LIRSuites firstTierLirSuites;
     private Providers firstTierProviders;
 
-    private SubstrateMethod[] methodsToCompile;
-    private byte[] graphEncoding;
-    private Object[] graphObjects;
-    private NodeClass<?>[] graphNodeTypes;
+    @UnknownObjectField(types = {SubstrateMethod[].class}) private SubstrateMethod[] methodsToCompile;
+    @UnknownObjectField(types = {byte[].class}) private byte[] graphEncoding;
+    @UnknownObjectField(types = {Object[].class}) private Object[] graphObjects;
+    @UnknownObjectField(types = {NodeClass[].class}) private NodeClass<?>[] graphNodeTypes;
 
     public final Map<Class<?>, NodeClass<?>> nodeClasses = new HashMap<>();
     public final Map<Class<?>, LIRInstructionClass<?>> instructionClasses = new HashMap<>();
@@ -254,6 +255,7 @@ public class GraalSupport {
 
         cache.put(phaseSubClass, newStatistics);
         access.requireAnalysisIteration();
+        access.rescanObject(newStatistics);
     }
 
     public static GraalSupport get() {

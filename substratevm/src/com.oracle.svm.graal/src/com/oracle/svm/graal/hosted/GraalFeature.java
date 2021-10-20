@@ -503,6 +503,9 @@ public final class GraalFeature implements Feature {
         }
         if (GraalSupport.setGraphEncoding(graphEncoder.getEncoding(), graphEncoder.getObjects(), nodeClasses)) {
             config.requireAnalysisIteration();
+            config.rescanObject(graphEncoder.getEncoding());
+            config.rescanObject(graphEncoder.getObjects());
+            config.rescanObject(nodeClasses);
         }
 
         if (objectReplacer.updateDataDuringAnalysis(config.getMetaAccess())) {

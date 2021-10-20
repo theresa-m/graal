@@ -46,8 +46,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
-import jdk.vm.ci.meta.MetaAccessProvider;
-import jdk.vm.ci.meta.ResolvedJavaField;
 import org.graalvm.compiler.serviceprovider.JavaVersionUtil;
 import org.graalvm.nativeimage.Platform;
 import org.graalvm.nativeimage.Platforms;
@@ -65,6 +63,9 @@ import com.oracle.svm.core.annotate.TargetClass;
 import com.oracle.svm.core.annotate.TargetElement;
 import com.oracle.svm.core.util.VMError;
 import com.oracle.svm.util.ReflectionUtil;
+
+import jdk.vm.ci.meta.MetaAccessProvider;
+import jdk.vm.ci.meta.ResolvedJavaField;
 
 // Checkstyle: stop
 import sun.security.jca.ProviderList;
@@ -653,6 +654,13 @@ final class Target_sun_security_ssl_SunJSSE {
 
 @TargetClass(className = "sun.security.jca.Providers")
 final class Target_sun_security_jca_Providers {
+    /*
+     * TODO The computation for providerList relies on repeated scans and assumes that eventually
+     * SecurityServicesFeature.usedProviders contains all used providers. That's why caching is also
+     * disabled. When the field is read too early is going to clean all providers, since none is yet
+     * found as used. With the new heap scanning there is no repeated scanning of the field.
+     */
+    // @UnknownObjectField isValidForAnalysis = false
     @Alias//
     @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Custom, declClass = ProviderListTransformer.class, disableCaching = true)//
     private static ProviderList providerList;

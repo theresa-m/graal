@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 import org.graalvm.compiler.debug.GraalError;
 import org.graalvm.util.GuardedAnnotationAccess;
 
+import com.oracle.graal.pointsto.PointsToAnalysis;
 import com.oracle.graal.pointsto.api.DefaultUnsafePartition;
 import com.oracle.graal.pointsto.api.HostVM;
 import com.oracle.graal.pointsto.api.PointstoOptions;
@@ -52,11 +53,13 @@ import jdk.vm.ci.meta.JavaKind;
 import jdk.vm.ci.meta.ResolvedJavaField;
 import jdk.vm.ci.meta.ResolvedJavaType;
 
-public class AnalysisField implements ResolvedJavaField, OriginalFieldProvider {
+public class AnalysisField extends ElementInfo implements ResolvedJavaField, OriginalFieldProvider {
 
     @SuppressWarnings("rawtypes")//
     private static final AtomicReferenceFieldUpdater<AnalysisField, Object> OBSERVERS_UPDATER = //
                     AtomicReferenceFieldUpdater.newUpdater(AnalysisField.class, Object.class, "observers");
+
+    private final AnalysisUniverse aUniverse;
 
     private final int id;
 
@@ -77,6 +80,8 @@ public class AnalysisField implements ResolvedJavaField, OriginalFieldProvider {
     private AtomicBoolean isAccessed = new AtomicBoolean();
     private AtomicBoolean isRead = new AtomicBoolean();
     private AtomicBoolean isWritten = new AtomicBoolean();
+    private final AtomicBoolean isReachable = new AtomicBoolean();
+
     private boolean isJNIAccessed;
     private boolean isUsedInComparison;
     private AtomicBoolean isUnsafeAccessed;
@@ -102,6 +107,8 @@ public class AnalysisField implements ResolvedJavaField, OriginalFieldProvider {
 
     public AnalysisField(AnalysisUniverse universe, ResolvedJavaField wrappedField) {
         assert !wrappedField.isInternal();
+
+        this.aUniverse = universe;
 
         this.position = -1;
         this.isUnsafeAccessed = new AtomicBoolean();
@@ -260,6 +267,7 @@ public class AnalysisField implements ResolvedJavaField, OriginalFieldProvider {
 
     public boolean registerAsAccessed() {
         boolean firstAttempt = AtomicUtils.atomicMark(isAccessed);
+        markReachable();
         notifyUpdateAccessInfo();
         return firstAttempt;
     }
@@ -270,6 +278,10 @@ public class AnalysisField implements ResolvedJavaField, OriginalFieldProvider {
         if (readBy != null && method != null) {
             readBy.put(method, Boolean.TRUE);
         }
+        if (firstAttempt) {
+            aUniverse.getHeapScanner().onFieldRead(this);
+        }
+        markReachable();
         return firstAttempt;
     }
 
@@ -285,7 +297,16 @@ public class AnalysisField implements ResolvedJavaField, OriginalFieldProvider {
         if (writtenBy != null && method != null) {
             writtenBy.put(method, Boolean.TRUE);
         }
+        markReachable();
         return firstAttempt;
+    }
+
+    public void markReachable() {
+        if (AtomicUtils.atomicMark(isReachable)) {
+            ((PointsToAnalysis) aUniverse.getBigbang()).handleUnknownValueField(this);
+            atomicMark(this);
+            getDeclaringClass().registerAsReachable();
+        }
     }
 
     public void registerAsUnsafeAccessed(AnalysisUniverse universe) {
@@ -445,6 +466,10 @@ public class AnalysisField implements ResolvedJavaField, OriginalFieldProvider {
     @Override
     public boolean isStatic() {
         return Modifier.isStatic(this.getModifiers());
+    }
+
+    public boolean isObjectField() {
+        return getJavaKind() == JavaKind.Object;
     }
 
     @Override

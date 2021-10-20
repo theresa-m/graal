@@ -178,6 +178,7 @@ public class FieldsOffsetsFeature implements Feature {
             registerFields(nodeClass, access);
 
             access.requireAnalysisIteration();
+            access.rescanObject(nodeClass);
         }
     }
 

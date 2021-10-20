@@ -47,19 +47,19 @@ import com.oracle.graal.pointsto.BigBang;
 import com.oracle.graal.pointsto.meta.AnalysisField;
 import com.oracle.graal.pointsto.meta.AnalysisMethod;
 import com.oracle.graal.pointsto.meta.AnalysisType;
+import com.oracle.svm.core.configure.ConditionalElement;
 import com.oracle.svm.core.configure.ConfigurationFile;
 import com.oracle.svm.core.configure.ConfigurationFiles;
-import com.oracle.svm.core.configure.ConditionalElement;
 import com.oracle.svm.core.configure.ReflectionConfigurationParser;
 import com.oracle.svm.core.jni.JNIRuntimeAccess;
 import com.oracle.svm.core.option.HostedOptionKey;
 import com.oracle.svm.core.util.UserError;
+import com.oracle.svm.hosted.ConditionalConfigurationRegistry;
 import com.oracle.svm.hosted.FallbackFeature;
 import com.oracle.svm.hosted.FeatureImpl.AfterRegistrationAccessImpl;
 import com.oracle.svm.hosted.FeatureImpl.BeforeAnalysisAccessImpl;
 import com.oracle.svm.hosted.FeatureImpl.CompilationAccessImpl;
 import com.oracle.svm.hosted.FeatureImpl.DuringAnalysisAccessImpl;
-import com.oracle.svm.hosted.ConditionalConfigurationRegistry;
 import com.oracle.svm.hosted.c.NativeLibraries;
 import com.oracle.svm.hosted.code.CEntryPointData;
 import com.oracle.svm.hosted.config.ConfigurationParserUtils;
@@ -257,7 +257,7 @@ public class JNIAccessFeature implements Feature {
         });
         newFields.clear();
 
-        JNIReflectionDictionary.singleton().addLinkages(newLinkages);
+        JNIReflectionDictionary.singleton().addLinkages(access, newLinkages);
         newLinkages.clear();
 
         access.requireAnalysisIteration();
@@ -267,7 +267,7 @@ public class JNIAccessFeature implements Feature {
         if (SubstitutionReflectivityFilter.shouldExclude(classObj, access.getMetaAccess(), access.getUniverse())) {
             return null;
         }
-        return JNIReflectionDictionary.singleton().addClassIfAbsent(classObj, c -> {
+        return JNIReflectionDictionary.singleton().addClassIfAbsent(access, classObj, c -> {
             AnalysisType analysisClass = access.getMetaAccess().lookupJavaType(classObj);
             if (analysisClass.isInterface() || (analysisClass.isInstanceClass() && analysisClass.isAbstract())) {
                 analysisClass.registerAsReachable();
@@ -284,7 +284,7 @@ public class JNIAccessFeature implements Feature {
         }
         JNIAccessibleClass jniClass = addClass(method.getDeclaringClass(), access);
         JNIAccessibleMethodDescriptor descriptor = JNIAccessibleMethodDescriptor.of(method);
-        jniClass.addMethodIfAbsent(descriptor, d -> {
+        jniClass.addMethodIfAbsent(access, descriptor, d -> {
             MetaAccessProvider wrappedMetaAccess = access.getMetaAccess().getWrapped();
 
             JNIJavaCallWrapperMethod varargsCallWrapper = new JNIJavaCallWrapperMethod(method, CallVariant.VARARGS, false, wrappedMetaAccess, nativeLibraries);
@@ -312,6 +312,7 @@ public class JNIAccessFeature implements Feature {
             });
             return jniMethod;
         });
+        access.rescanObject(jniClass);
     }
 
     private static void addField(Field reflField, boolean writable, DuringAnalysisAccessImpl access) {
@@ -321,7 +322,8 @@ public class JNIAccessFeature implements Feature {
         }
         JNIAccessibleClass jniClass = addClass(reflField.getDeclaringClass(), access);
         AnalysisField field = access.getMetaAccess().lookupJavaField(reflField);
-        jniClass.addFieldIfAbsent(field.getName(), name -> new JNIAccessibleField(jniClass, name, field.getJavaKind(), field.getModifiers()));
+        jniClass.addFieldIfAbsent(access, field.getName(), name -> new JNIAccessibleField(jniClass, name, field.getJavaKind(), field.getModifiers()));
+        access.rescanObject(jniClass);
         field.registerAsJNIAccessed();
         field.registerAsRead(null);
         if (writable) {

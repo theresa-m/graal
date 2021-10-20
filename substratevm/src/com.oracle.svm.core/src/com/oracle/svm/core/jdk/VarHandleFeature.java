@@ -350,55 +350,55 @@ final class Target_java_lang_invoke_VarHandleObjects_Array {
 
 @TargetClass(className = "java.lang.invoke.VarHandleBooleans", innerClass = "FieldInstanceReadOnly", onlyWith = JDK11OrLater.class)
 final class Target_java_lang_invoke_VarHandleBooleans_FieldInstanceReadOnly {
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
 @TargetClass(className = "java.lang.invoke.VarHandleBytes", innerClass = "FieldInstanceReadOnly", onlyWith = JDK11OrLater.class)
 final class Target_java_lang_invoke_VarHandleBytes_FieldInstanceReadOnly {
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
 @TargetClass(className = "java.lang.invoke.VarHandleChars", innerClass = "FieldInstanceReadOnly", onlyWith = JDK11OrLater.class)
 final class Target_java_lang_invoke_VarHandleChars_FieldInstanceReadOnly {
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
 @TargetClass(className = "java.lang.invoke.VarHandleDoubles", innerClass = "FieldInstanceReadOnly", onlyWith = JDK11OrLater.class)
 final class Target_java_lang_invoke_VarHandleDoubles_FieldInstanceReadOnly {
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
 @TargetClass(className = "java.lang.invoke.VarHandleFloats", innerClass = "FieldInstanceReadOnly", onlyWith = JDK11OrLater.class)
 final class Target_java_lang_invoke_VarHandleFloats_FieldInstanceReadOnly {
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
 @TargetClass(className = "java.lang.invoke.VarHandleInts", innerClass = "FieldInstanceReadOnly", onlyWith = JDK11OrLater.class)
 final class Target_java_lang_invoke_VarHandleInts_FieldInstanceReadOnly {
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
 @TargetClass(className = "java.lang.invoke.VarHandleLongs", innerClass = "FieldInstanceReadOnly", onlyWith = JDK11OrLater.class)
 final class Target_java_lang_invoke_VarHandleLongs_FieldInstanceReadOnly {
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
 @TargetClass(className = "java.lang.invoke.VarHandleShorts", innerClass = "FieldInstanceReadOnly", onlyWith = JDK11OrLater.class)
 final class Target_java_lang_invoke_VarHandleShorts_FieldInstanceReadOnly {
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
 @TargetClass(classNameProvider = VarHandleObjectsClassNameProvider.class, innerClass = "FieldInstanceReadOnly", onlyWith = JDK11OrLater.class)
 final class Target_java_lang_invoke_VarHandleObjects_FieldInstanceReadOnly {
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
@@ -413,7 +413,7 @@ final class Target_java_lang_invoke_VarHandleObjects_FieldInstanceReadOnly {
 final class Target_java_lang_invoke_VarHandleBooleans_FieldStaticReadOnly {
     @Alias @InjectAccessors(VarHandleFieldStaticBasePrimitiveAccessor.class) //
     Object base;
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
@@ -421,7 +421,7 @@ final class Target_java_lang_invoke_VarHandleBooleans_FieldStaticReadOnly {
 final class Target_java_lang_invoke_VarHandleBytes_FieldStaticReadOnly {
     @Alias @InjectAccessors(VarHandleFieldStaticBasePrimitiveAccessor.class) //
     Object base;
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
@@ -429,7 +429,7 @@ final class Target_java_lang_invoke_VarHandleBytes_FieldStaticReadOnly {
 final class Target_java_lang_invoke_VarHandleChars_FieldStaticReadOnly {
     @Alias @InjectAccessors(VarHandleFieldStaticBasePrimitiveAccessor.class) //
     Object base;
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
@@ -437,7 +437,7 @@ final class Target_java_lang_invoke_VarHandleChars_FieldStaticReadOnly {
 final class Target_java_lang_invoke_VarHandleDoubles_FieldStaticReadOnly {
     @Alias @InjectAccessors(VarHandleFieldStaticBasePrimitiveAccessor.class) //
     Object base;
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
@@ -445,7 +445,7 @@ final class Target_java_lang_invoke_VarHandleDoubles_FieldStaticReadOnly {
 final class Target_java_lang_invoke_VarHandleFloats_FieldStaticReadOnly {
     @Alias @InjectAccessors(VarHandleFieldStaticBasePrimitiveAccessor.class) //
     Object base;
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
@@ -453,7 +453,7 @@ final class Target_java_lang_invoke_VarHandleFloats_FieldStaticReadOnly {
 final class Target_java_lang_invoke_VarHandleInts_FieldStaticReadOnly {
     @Alias @InjectAccessors(VarHandleFieldStaticBasePrimitiveAccessor.class) //
     Object base;
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
@@ -461,7 +461,7 @@ final class Target_java_lang_invoke_VarHandleInts_FieldStaticReadOnly {
 final class Target_java_lang_invoke_VarHandleLongs_FieldStaticReadOnly {
     @Alias @InjectAccessors(VarHandleFieldStaticBasePrimitiveAccessor.class) //
     Object base;
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
@@ -469,7 +469,7 @@ final class Target_java_lang_invoke_VarHandleLongs_FieldStaticReadOnly {
 final class Target_java_lang_invoke_VarHandleShorts_FieldStaticReadOnly {
     @Alias @InjectAccessors(VarHandleFieldStaticBasePrimitiveAccessor.class) //
     Object base;
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 
@@ -477,7 +477,7 @@ final class Target_java_lang_invoke_VarHandleShorts_FieldStaticReadOnly {
 final class Target_java_lang_invoke_VarHandleObjects_FieldStaticReadOnly {
     @Alias @InjectAccessors(VarHandleFieldStaticBaseObjectAccessor.class) //
     Object base;
-    @Alias @RecomputeFieldValue(kind = Kind.Custom, declClass = VarHandleFieldOffsetComputer.class) //
+    @Alias @RecomputeFieldValue(kind = Kind.Custom, isValidForAnalysis = false, declClass = VarHandleFieldOffsetComputer.class) //
     long fieldOffset;
 }
 

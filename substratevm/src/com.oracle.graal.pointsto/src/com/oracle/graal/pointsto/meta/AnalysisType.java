@@ -56,6 +56,7 @@ import com.oracle.graal.pointsto.flow.context.object.ConstantContextSensitiveObj
 import com.oracle.graal.pointsto.infrastructure.OriginalClassProvider;
 import com.oracle.graal.pointsto.infrastructure.WrappedJavaType;
 import com.oracle.graal.pointsto.typestate.TypeState;
+import com.oracle.graal.pointsto.util.AnalysisError;
 import com.oracle.graal.pointsto.util.AnalysisFuture;
 import com.oracle.graal.pointsto.util.AtomicUtils;
 import com.oracle.graal.pointsto.util.ConcurrentLightHashSet;
@@ -72,7 +73,7 @@ import jdk.vm.ci.meta.ResolvedJavaMethod;
 import jdk.vm.ci.meta.ResolvedJavaType;
 import jdk.vm.ci.meta.Signature;
 
-public class AnalysisType implements WrappedJavaType, OriginalClassProvider, Comparable<AnalysisType> {
+public class AnalysisType extends ElementInfo implements WrappedJavaType, OriginalClassProvider, Comparable<AnalysisType> {
 
     @SuppressWarnings("rawtypes")//
     private static final AtomicReferenceFieldUpdater<AnalysisType, ConcurrentHashMap> UNSAFE_ACCESS_FIELDS_UPDATER = //
@@ -155,6 +156,10 @@ public class AnalysisType implements WrappedJavaType, OriginalClassProvider, Com
     }
 
     private final AnalysisFuture<Void> initializationTask;
+    /**
+     * Additional information that is only available for types that are marked as reachable.
+     */
+    final AnalysisFuture<TypeData> typeData;
 
     AnalysisType(AnalysisUniverse universe, ResolvedJavaType javaType, JavaKind storageKind, AnalysisType objectType) {
         this.universe = universe;
@@ -232,6 +237,10 @@ public class AnalysisType implements WrappedJavaType, OriginalClassProvider, Com
 
         /* The registration task initializes the type. */
         this.initializationTask = new AnalysisFuture<>(() -> universe.hostVM.initializeType(this), null);
+        this.typeData = new AnalysisFuture<>(() -> {
+            AnalysisError.guarantee(universe.getHeapScanner() != null, "Heap scanner is not available.");
+            return universe.getHeapScanner().computeTypeData(this);
+        });
     }
 
     private AnalysisType[] convertTypes(ResolvedJavaType[] originalTypes) {
@@ -528,6 +537,11 @@ public class AnalysisType implements WrappedJavaType, OriginalClassProvider, Com
     private synchronized void addAssignableType(BigBang bb, TypeState typeState) {
         assignableTypesState = TypeState.forUnion(((PointsToAnalysis) bb), assignableTypesState, typeState);
         assignableTypesNonNullState = assignableTypesState.forNonNull(((PointsToAnalysis) bb));
+    }
+
+    public TypeData getOrComputeData() {
+        GraalError.guarantee(isReachable.get(), "TypeData is only available for reachable types");
+        return this.typeData.ensureDone();
     }
 
     public void ensureInitialized() {

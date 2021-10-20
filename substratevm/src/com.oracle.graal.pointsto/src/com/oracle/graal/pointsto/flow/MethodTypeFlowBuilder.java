@@ -277,13 +277,14 @@ public class MethodTypeFlowBuilder {
     }
 
     private void registerEmbeddedRoot(ConstantNode cn) {
+        BytecodePosition position = cn.getNodeSourcePosition();
+        if (position == null) {
+            position = new BytecodePosition(null, method, 0);
+        }
         if (bb.scanningPolicy().trackConstant(bb, cn.asJavaConstant())) {
-            BytecodePosition position = cn.getNodeSourcePosition();
-            if (position == null) {
-                position = new BytecodePosition(null, method, 0);
-            }
             bb.getUniverse().registerEmbeddedRoot(cn.asJavaConstant(), position);
         }
+        bb.getUniverse().getHeapScanner().scanEmbeddedRoot(cn.asJavaConstant(), position);
     }
 
     private static void registerForeignCall(PointsToAnalysis bb, ForeignCallDescriptor foreignCallDescriptor) {

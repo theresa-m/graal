@@ -326,6 +326,9 @@ public class ClassInitializationFeature implements GraalFeature {
             info = type.getClassInitializer() == null ? ClassInitializationInfo.NO_INITIALIZER_INFO_SINGLETON : ClassInitializationInfo.INITIALIZED_INFO_SINGLETON;
         }
         hub.setClassInitializationInfo(info, type.hasDefaultMethods(), type.declaresDefaultMethods());
+        // TODO rescanning the hub here should not be necessary
+        access.getUniverse().getHeapScanner().scanHub(type);
+        access.rescanObject(info);
     }
 
     private static ClassInitializationInfo buildRuntimeInitializationInfo(FeatureImpl.DuringAnalysisAccessImpl access, AnalysisType type) {

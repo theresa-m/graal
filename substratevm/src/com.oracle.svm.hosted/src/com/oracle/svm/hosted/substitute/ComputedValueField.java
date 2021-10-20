@@ -45,6 +45,7 @@ import com.oracle.graal.pointsto.infrastructure.OriginalFieldProvider;
 import com.oracle.graal.pointsto.meta.AnalysisField;
 import com.oracle.graal.pointsto.meta.AnalysisMetaAccess;
 import com.oracle.graal.pointsto.util.GraalAccess;
+import com.oracle.svm.core.BuildPhaseProvider;
 import com.oracle.svm.core.annotate.RecomputeFieldValue;
 import com.oracle.svm.core.annotate.RecomputeFieldValue.CustomFieldValueComputer;
 import com.oracle.svm.core.annotate.RecomputeFieldValue.CustomFieldValueTransformer;
@@ -83,6 +84,7 @@ public class ComputedValueField implements ReadableJavaField, OriginalFieldProvi
     private final Field targetField;
     private final boolean isFinal;
     private final boolean disableCaching;
+    private final boolean isValidForAnalysis;
 
     private JavaConstant constantValue;
 
@@ -94,14 +96,19 @@ public class ComputedValueField implements ReadableJavaField, OriginalFieldProvi
     private JavaConstant valueCacheNullKey;
     private final ReentrantReadWriteLock valueCacheLock = new ReentrantReadWriteLock();
 
+    public ComputedValueField(ResolvedJavaField original, ResolvedJavaField annotated, RecomputeFieldValue.Kind kind, Class<?> targetClass, String targetName, boolean isFinal) {
+        this(original, annotated, kind, targetClass, targetName, isFinal, false, true);
+    }
+
     public ComputedValueField(ResolvedJavaField original, ResolvedJavaField annotated, RecomputeFieldValue.Kind kind, Class<?> targetClass, String targetName, boolean isFinal,
-                    boolean disableCaching) {
+                    boolean disableCaching, boolean isValidForAnalysis) {
         this.original = original;
         this.annotated = annotated;
         this.kind = kind;
         this.targetClass = targetClass;
         this.isFinal = isFinal;
         this.disableCaching = disableCaching;
+        this.isValidForAnalysis = isValidForAnalysis;
 
         Field f = null;
         switch (kind) {
@@ -121,14 +128,24 @@ public class ComputedValueField implements ReadableJavaField, OriginalFieldProvi
         this.valueCache = EconomicMap.create();
     }
 
-    public ComputedValueField(ResolvedJavaField original, ResolvedJavaField annotated, RecomputeFieldValue.Kind kind, Class<?> targetClass, String targetName, boolean isFinal) {
-        this(original, annotated, kind, targetClass, targetName, isFinal, false);
+    public static boolean isFinalValid(RecomputeFieldValue.Kind kind) {
+        return isNotOffsetRecomputation(kind);
     }
 
-    public static boolean isFinalValid(RecomputeFieldValue.Kind kind) {
-        EnumSet<RecomputeFieldValue.Kind> finalIllegal = EnumSet.of(RecomputeFieldValue.Kind.FieldOffset,
+    public static boolean isNotOffsetRecomputation(RecomputeFieldValue.Kind kind) {
+        EnumSet<RecomputeFieldValue.Kind> offsetRecomputations = EnumSet.of(RecomputeFieldValue.Kind.FieldOffset,
                         RecomputeFieldValue.Kind.TranslateFieldOffset, RecomputeFieldValue.Kind.AtomicFieldUpdaterOffset);
-        return !finalIllegal.contains(kind);
+        return !offsetRecomputations.contains(kind);
+    }
+
+    @Override
+    public boolean isValueValidForAnalysis() {
+        return isValidForAnalysis && isNotOffsetRecomputation(kind);
+    }
+
+    @Override
+    public boolean isValueAvailable() {
+        return constantValue != null || BuildPhaseProvider.isAnalysisFinished() || isValueValidForAnalysis();
     }
 
     public ResolvedJavaField getAnnotated() {
@@ -181,6 +198,13 @@ public class ComputedValueField implements ReadableJavaField, OriginalFieldProvi
         return original.isSynthetic();
     }
 
+    /*
+     * TODO remove this method
+     * 
+     * It is a catch-all method in case we forgot to register some of the target fields as accessed.
+     * AnnotationSubstitutionProcessor.processComputedValueFields() also registers the target fields
+     * of the automatic re-computation as unsafe accessed.
+     */
     public void processAnalysis(AnalysisMetaAccess aMetaAccess) {
         switch (kind) {
             case FieldOffset:

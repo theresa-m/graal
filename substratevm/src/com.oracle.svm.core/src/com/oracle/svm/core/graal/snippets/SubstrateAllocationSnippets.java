@@ -50,6 +50,7 @@ import org.graalvm.compiler.nodes.NamedLocationIdentity;
 import org.graalvm.compiler.nodes.PiNode;
 import org.graalvm.compiler.nodes.SnippetAnchorNode;
 import org.graalvm.compiler.nodes.StructuredGraph;
+import org.graalvm.compiler.nodes.UnreachableNode;
 import org.graalvm.compiler.nodes.ValueNode;
 import org.graalvm.compiler.nodes.extended.ForeignCallNode;
 import org.graalvm.compiler.nodes.extended.ForeignCallWithExceptionNode;
@@ -77,11 +78,11 @@ import org.graalvm.word.WordFactory;
 import com.oracle.svm.core.SubstrateOptions;
 import com.oracle.svm.core.allocationprofile.AllocationCounter;
 import com.oracle.svm.core.allocationprofile.AllocationSite;
+import com.oracle.svm.core.annotate.UnknownObjectField;
 import com.oracle.svm.core.config.ConfigurationValues;
 import com.oracle.svm.core.graal.meta.SubstrateForeignCallsProvider;
 import com.oracle.svm.core.graal.nodes.NewStoredContinuationNode;
 import com.oracle.svm.core.graal.nodes.SubstrateNewHybridInstanceNode;
-import org.graalvm.compiler.nodes.UnreachableNode;
 import com.oracle.svm.core.heap.Heap;
 import com.oracle.svm.core.heap.StoredContinuation;
 import com.oracle.svm.core.hub.DynamicHub;
@@ -412,7 +413,7 @@ public abstract class SubstrateAllocationSnippets extends AllocationSnippets {
 
     public abstract static class Templates extends SubstrateTemplates {
         protected final AllocationSnippetCounters snippetCounters;
-        private final AllocationProfilingData profilingData;
+        @UnknownObjectField(types = {AllocationProfilingData.class}) private AllocationProfilingData profilingData;
 
         private final SnippetInfo allocateInstance;
         private final SnippetInfo allocateArray;

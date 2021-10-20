@@ -44,7 +44,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.oracle.svm.core.option.OptionUtils;
 import org.graalvm.compiler.debug.DebugContext;
 import org.graalvm.compiler.options.Option;
 import org.graalvm.compiler.options.OptionType;
@@ -57,6 +56,7 @@ import com.oracle.svm.core.annotate.AutomaticFeature;
 import com.oracle.svm.core.jdk.Resources;
 import com.oracle.svm.core.option.HostedOptionKey;
 import com.oracle.svm.core.option.LocatableMultiOptionValue;
+import com.oracle.svm.core.option.OptionUtils;
 import com.oracle.svm.core.option.SubstrateOptionsParser;
 import com.oracle.svm.core.util.UserError;
 import com.oracle.svm.hosted.FeatureImpl.DuringAnalysisAccessImpl;
@@ -356,6 +356,7 @@ public class ServiceLoaderFeature implements Feature {
             debugContext.log("ServiceLoaderFeature: registerResource: " + serviceResourceLocation);
         }
         Resources.registerResource(serviceResourceLocation, new ByteArrayInputStream(newResourceValue.toString().getBytes(StandardCharsets.UTF_8)));
+        // access.rescanObject(ImageSingletons.lookup(Resources.ResourcesSupport.class).hostedResources);
 
         /* Ensure that the static analysis runs again for the new implementation classes. */
         access.requireAnalysisIteration();

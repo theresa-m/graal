@@ -217,7 +217,9 @@ public class GraalObjectReplacer implements Function<Object, Object> {
              * Annotations are updated in every analysis iteration, but this is a starting point. It
              * also ensures that all types used by annotations are created eagerly.
              */
-            sMethod.setAnnotationsEncoding(AnnotationsProcessor.encodeAnnotations(aMetaAccess, aMethod.getAnnotations(), aMethod.getDeclaredAnnotations(), null));
+            Object annotationsEncoding = AnnotationsProcessor.encodeAnnotations(aMetaAccess, aMethod.getAnnotations(), aMethod.getDeclaredAnnotations(), null);
+            sMethod.setAnnotationsEncoding(annotationsEncoding);
+            aUniverse.getHeapScanner().rescanObject(annotationsEncoding);
         }
         return sMethod;
     }
@@ -378,8 +380,10 @@ public class GraalObjectReplacer implements Function<Object, Object> {
         }
 
         for (Map.Entry<AnalysisMethod, SubstrateMethod> entry : methods.entrySet()) {
-            if (entry.getValue().setAnnotationsEncoding(AnnotationsProcessor.encodeAnnotations(metaAccess, entry.getKey().getAnnotations(), entry.getKey().getDeclaredAnnotations(),
-                            entry.getValue().getAnnotationsEncoding()))) {
+            Object annotationsEncoding = AnnotationsProcessor.encodeAnnotations(metaAccess, entry.getKey().getAnnotations(), entry.getKey().getDeclaredAnnotations(),
+                            entry.getValue().getAnnotationsEncoding());
+            aUniverse.getHeapScanner().rescanObject(annotationsEncoding);
+            if (entry.getValue().setAnnotationsEncoding(annotationsEncoding)) {
                 result = true;
             }
         }

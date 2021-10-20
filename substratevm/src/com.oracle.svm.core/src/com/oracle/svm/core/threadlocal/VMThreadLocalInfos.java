@@ -60,6 +60,10 @@ public class VMThreadLocalInfos {
         }
     }
 
+    public VMThreadLocalInfo[] getInfos() {
+        return infos;
+    }
+
     public static void dumpToLog(Log log, IsolateThread thread, boolean isJavaHeapAccessAllowed) {
         for (VMThreadLocalInfo info : ImageSingletons.lookup(VMThreadLocalInfos.class).infos) {
             log.signed(info.offset).string(" (").signed(info.sizeInBytes).string(" bytes): ").string(info.name).string(" = ");
