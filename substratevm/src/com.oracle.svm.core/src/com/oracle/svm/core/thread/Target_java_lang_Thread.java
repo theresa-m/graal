@@ -28,13 +28,13 @@ import java.security.AccessControlContext;
 import java.util.Map;
 import java.util.Objects;
 
-import com.oracle.svm.core.annotate.AnnotateOriginal;
 import org.graalvm.compiler.serviceprovider.JavaVersionUtil;
 import org.graalvm.nativeimage.IsolateThread;
 
 import com.oracle.svm.core.SubstrateOptions;
 import com.oracle.svm.core.SubstrateUtil;
 import com.oracle.svm.core.annotate.Alias;
+import com.oracle.svm.core.annotate.AnnotateOriginal;
 import com.oracle.svm.core.annotate.Delete;
 import com.oracle.svm.core.annotate.Inject;
 import com.oracle.svm.core.annotate.RecomputeFieldValue;
@@ -194,12 +194,12 @@ public final class Target_java_lang_Thread {
         this.unsafeParkEvent = new AtomicReference<>();
         this.sleepParkEvent = new AtomicReference<>();
 
-        JavaContinuations.LoomCompatibilityUtil.initThreadFields(this,
+        LoomSupport.CompatibilityUtil.initThreadFields(this,
                         (withGroup != null) ? withGroup : JavaThreads.singleton().mainGroup,
                         null, 0,
                         Thread.NORM_PRIORITY, asDaemon, ThreadStatus.RUNNABLE);
 
-        if (JavaContinuations.useLoom()) {
+        if (LoomSupport.isEnabled()) {
             tid = Target_java_lang_Thread_ThreadIdentifiers.next();
         } else {
             tid = nextThreadID();
@@ -368,7 +368,7 @@ public final class Target_java_lang_Thread {
          * Otherwise, a call to Thread.join() in the parent thread could succeed even before the
          * child thread starts, or it could hang in case that the child thread is already dead.
          */
-        JavaContinuations.LoomCompatibilityUtil.setThreadStatus(this, ThreadStatus.RUNNABLE);
+        LoomSupport.CompatibilityUtil.setThreadStatus(this, ThreadStatus.RUNNABLE);
         wasStartedByCurrentIsolate = true;
         parentThreadId = Thread.currentThread().getId();
         long stackSize = JavaThreads.getRequestedThreadSize(JavaThreads.fromTarget(this));
