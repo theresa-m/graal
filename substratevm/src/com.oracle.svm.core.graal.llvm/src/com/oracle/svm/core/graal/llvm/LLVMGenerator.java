@@ -83,6 +83,7 @@ import org.graalvm.compiler.nodes.type.NarrowOopStamp;
 import org.graalvm.compiler.phases.util.Providers;
 import org.graalvm.compiler.serviceprovider.JavaVersionUtil;
 import org.graalvm.nativeimage.c.constant.CEnum;
+import org.graalvm.nativeimage.c.function.CEntryPoint;
 import org.graalvm.util.GuardedAnnotationAccess;
 
 import com.oracle.svm.core.FrameAccess;
@@ -277,7 +278,7 @@ public class LLVMGenerator implements LIRGeneratorTool, SubstrateLIRGenerator {
             Object entryPointData = ((HostedMethod) method).getWrapped().getEntryPointData();
             if (entryPointData instanceof CEntryPointData) {
                 CEntryPointData cEntryPointData = (CEntryPointData) entryPointData;
-                if (cEntryPointData.getPublishAs() != CEntryPointOptions.Publish.NotPublished) {
+                if (cEntryPointData.getPublishAs() != CEntryPoint.Publish.NotPublished) {
                     String entryPointSymbolName = cEntryPointData.getSymbolName();
                     assert !entryPointSymbolName.isEmpty();
                     builder.addAlias(entryPointSymbolName);
