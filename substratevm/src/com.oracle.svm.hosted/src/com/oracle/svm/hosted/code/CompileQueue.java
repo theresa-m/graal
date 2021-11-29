@@ -184,6 +184,8 @@ import jdk.vm.ci.meta.ResolvedJavaField;
 import jdk.vm.ci.meta.ResolvedJavaMethod;
 import jdk.vm.ci.meta.ResolvedJavaType;
 
+import static com.oracle.graal.pointsto.api.PointstoOptions.CollectImageBuildStatistics;
+
 public class CompileQueue {
 
     public interface ParseFunction {
@@ -437,7 +439,7 @@ public class CompileQueue {
         phaseSuite.appendPhase(new StrengthenStampsPhase());
         phaseSuite.appendPhase(CanonicalizerPhase.create());
         phaseSuite.appendPhase(new OptimizeExceptionPathsPhase());
-        if (ImageBuildStatistics.Options.CollectImageBuildStatistics.getValue(universe.hostVM().options())) {
+        if (CollectImageBuildStatistics.getValue(universe.hostVM().options())) {
             phaseSuite.appendPhase(CanonicalizerPhase.create());
             phaseSuite.appendPhase(new ImageBuildStatisticsCounterPhase(ImageBuildStatistics.CheckCountLocation.AFTER_PARSE_CANONICALIZATION));
         }
