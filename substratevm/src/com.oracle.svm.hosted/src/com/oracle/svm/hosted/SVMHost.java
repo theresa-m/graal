@@ -45,7 +45,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 
-import com.oracle.svm.core.jdk.SealedClassSupport;
 import org.graalvm.compiler.core.common.spi.ForeignCallDescriptor;
 import org.graalvm.compiler.core.common.spi.ForeignCallsProvider;
 import org.graalvm.compiler.debug.MethodFilter;
@@ -103,6 +102,7 @@ import com.oracle.svm.core.hub.HubType;
 import com.oracle.svm.core.hub.ReferenceType;
 import com.oracle.svm.core.jdk.ClassLoaderSupport;
 import com.oracle.svm.core.jdk.RecordSupport;
+import com.oracle.svm.core.jdk.SealedClassSupport;
 import com.oracle.svm.core.option.HostedOptionKey;
 import com.oracle.svm.core.option.SubstrateOptionsParser;
 import com.oracle.svm.core.util.HostedStringDeduplication;
@@ -556,6 +556,11 @@ public class SVMHost implements HostVM {
 
             if (parseOnce) {
                 optimizeAfterParsing(bb, graph);
+                /*
+                 * Do a complete Canonicalizer run once before graph encoding, to clean up any
+                 * leftover uncanonicalized nodes.
+                 */
+                CanonicalizerPhase.create().apply(graph, bb.getProviders());
             }
 
             for (BiConsumer<AnalysisMethod, StructuredGraph> methodAfterParsingHook : methodAfterParsingHooks) {
@@ -568,11 +573,6 @@ public class SVMHost implements HostVM {
         new ImplicitAssertionsPhase().apply(graph, bb.getProviders());
         new BoxNodeIdentityPhase().apply(graph, bb.getProviders());
         new PartialEscapePhase(false, false, CanonicalizerPhase.create(), null, options).apply(graph, bb.getProviders());
-        /*
-         * Do a complete Canonicalizer run once before graph encoding, to clean up any leftover
-         * uncanonicalized nodes.
-         */
-        CanonicalizerPhase.create().apply(graph, bb.getProviders());
     }
 
     @Override
