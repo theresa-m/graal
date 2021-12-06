@@ -233,7 +233,7 @@ public final class Target_java_lang_Thread {
     @Substitute
     @TargetElement(onlyWith = NotLoomJDK.class)
     static Thread currentThread() {
-        Thread thread = JavaThreads.currentThread.get();
+        Thread thread = JavaThreads.platformThread.get();
         assert thread != null : "Thread has not been set yet";
         return thread;
     }
@@ -242,7 +242,7 @@ public final class Target_java_lang_Thread {
     @Substitute
     @TargetElement(onlyWith = LoomJDK.class)
     private static Thread currentThread0() {
-        Thread thread = JavaThreads.currentThread.get();
+        Thread thread = JavaThreads.platformThread.get();
         assert thread != null : "Thread has not been set yet";
         return thread;
     }

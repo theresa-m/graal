@@ -1082,7 +1082,7 @@ public final class GCImpl implements GC {
              */
             return;
 
-        } else if (!JavaThreads.currentJavaThreadInitialized()) {
+        } else if (!JavaThreads.currentPlatformThreadInitialized()) {
             /*
              * Too early in the attach sequence of a thread to do anything useful, e.g., perform a
              * synchronization. Probably the allocation slow path for the first allocation of that

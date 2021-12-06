@@ -85,8 +85,8 @@ public abstract class JavaThreads {
         return ImageSingletons.lookup(JavaThreads.class);
     }
 
-    /** The {@link java.lang.Thread} for the {@link IsolateThread}. */
-    static final FastThreadLocalObject<Thread> currentThread = FastThreadLocalFactory.createObject(Thread.class, "JavaThreads.currentThread").setMaxOffset(FastThreadLocal.BYTE_OFFSET);
+    /** The platform {@link java.lang.Thread} for the {@link IsolateThread}. */
+    static final FastThreadLocalObject<Thread> platformThread = FastThreadLocalFactory.createObject(Thread.class, "JavaThreads.platformThread").setMaxOffset(FastThreadLocal.BYTE_OFFSET);
 
     /**
      * The number of running non-daemon threads. The initial value accounts for the main thread,
@@ -195,7 +195,7 @@ public abstract class JavaThreads {
 
     @Uninterruptible(reason = "Called from uninterruptible code.", mayBeInlined = true)
     protected static boolean wasStartedByCurrentIsolate(IsolateThread thread) {
-        Thread javaThread = currentThread.get(thread);
+        Thread javaThread = platformThread.get(thread);
         return wasStartedByCurrentIsolate(javaThread);
     }
 
@@ -215,7 +215,7 @@ public abstract class JavaThreads {
     public static Thread fromVMThread(IsolateThread thread) {
         assert CurrentIsolate.getCurrentThread() == thread || VMOperation.isInProgressAtSafepoint() || VMThreads.THREAD_MUTEX.isOwner() ||
                         SubstrateDiagnostics.isFatalErrorHandlingThread() : "must prevent the isolate thread from exiting";
-        return currentThread.get(thread);
+        return platformThread.get(thread);
     }
 
     public static boolean isVirtual(Thread thread) {
@@ -253,9 +253,9 @@ public abstract class JavaThreads {
     static void cleanupBeforeDetach(IsolateThread thread) {
         VMError.guarantee(thread.equal(CurrentIsolate.getCurrentThread()), "Cleanup must execute in detaching thread");
 
-        Target_java_lang_Thread javaThread = SubstrateUtil.cast(currentThread.get(thread), Target_java_lang_Thread.class);
+        Target_java_lang_Thread javaThread = SubstrateUtil.cast(platformThread.get(thread), Target_java_lang_Thread.class);
         javaThread.exit();
-        ThreadListenerSupport.get().afterThreadExit(CurrentIsolate.getCurrentThread(), currentThread.get(thread));
+        ThreadListenerSupport.get().afterThreadExit(CurrentIsolate.getCurrentThread(), platformThread.get(thread));
     }
 
     /**
@@ -333,8 +333,8 @@ public abstract class JavaThreads {
      * Returns true if the {@link Thread} object for the current thread exists. This method only
      * returns false in the very early initialization stages of a newly attached thread.
      */
-    public static boolean currentJavaThreadInitialized() {
-        return currentThread.get() != null;
+    public static boolean currentPlatformThreadInitialized() {
+        return platformThread.get() != null;
     }
 
     /**
@@ -344,12 +344,12 @@ public abstract class JavaThreads {
      * @return true if a new thread was created; false if a {@link Thread} object had already been
      *         assigned.
      */
-    public static boolean ensureJavaThread() {
+    public static boolean ensurePlatformThread() {
         /*
          * The thread was manually attached and started as a java.lang.Thread, so we consider it a
          * daemon thread.
          */
-        return ensureJavaThread(null, null, true);
+        return ensurePlatformThread(null, null, true);
     }
 
     /**
@@ -362,9 +362,9 @@ public abstract class JavaThreads {
      * @return true if a new thread was created; false if a {@link Thread} object had already been
      *         assigned.
      */
-    public static boolean ensureJavaThread(String name, ThreadGroup group, boolean asDaemon) {
-        if (currentThread.get() == null) {
-            assignJavaThread(JavaThreads.fromTarget(new Target_java_lang_Thread(name, group, asDaemon)), true);
+    public static boolean ensurePlatformThread(String name, ThreadGroup group, boolean asDaemon) {
+        if (platformThread.get() == null) {
+            assignPlatformThread(JavaThreads.fromTarget(new Target_java_lang_Thread(name, group, asDaemon)), true);
             return true;
         }
         return false;
@@ -375,11 +375,11 @@ public abstract class JavaThreads {
      * {@link VMThreads} as an {@link IsolateThread}.
      *
      * The manuallyStarted parameter is true if this thread was started directly by calling
-     * assignJavaThread(Thread). It is false when the thread is started using
-     * PosixJavaThreads.pthreadStartRoutine, e.g., called from PosixJavaThreads.start0.
+     * {@link #ensurePlatformThread(String, ThreadGroup, boolean)}. It is false when the thread is
+     * started via {@link #doStartThread} and {@link #threadStartRoutine}.
      */
-    public static void assignJavaThread(Thread thread, boolean manuallyStarted) {
-        assignJavaThread0(thread);
+    public static void assignPlatformThread(Thread thread, boolean manuallyStarted) {
+        assignPlatformThread0(thread);
 
         /* If the thread was manually started, finish initializing it. */
         if (manuallyStarted) {
@@ -395,9 +395,9 @@ public abstract class JavaThreads {
     }
 
     @Uninterruptible(reason = "Called from uninterruptible code.", mayBeInlined = true)
-    private static void assignJavaThread0(Thread thread) {
-        VMError.guarantee(currentThread.get() == null, "overwriting existing java.lang.Thread");
-        currentThread.set(thread);
+    private static void assignPlatformThread0(Thread thread) {
+        VMError.guarantee(platformThread.get() == null, "overwriting existing java.lang.Thread");
+        platformThread.set(thread);
 
         assert toTarget(thread).isolateThread.isNull();
         toTarget(thread).isolateThread = CurrentIsolate.getCurrentThread();
@@ -407,7 +407,7 @@ public abstract class JavaThreads {
     @Uninterruptible(reason = "Called during isolate initialization")
     public void initializeIsolate() {
         /* The thread that creates the isolate is considered the "main" thread. */
-        assignJavaThread0(mainThread);
+        assignPlatformThread0(mainThread);
     }
 
     /**
@@ -422,14 +422,14 @@ public abstract class JavaThreads {
             return true;
         }
         /* Tell all the threads that the VM is being torn down. */
-        return tearDownJavaThreads();
+        return tearDownPlatformThreads();
     }
 
     @Uninterruptible(reason = "Thread is detaching and holds the THREAD_MUTEX.")
     public static void detachThread(IsolateThread vmThread) {
         VMThreads.THREAD_MUTEX.assertIsOwner("Must hold the THREAD_MUTEX.");
 
-        Thread thread = currentThread.get(vmThread);
+        Thread thread = platformThread.get(vmThread);
         ParkEvent.detach(getUnsafeParkEvent(thread));
         ParkEvent.detach(getSleepParkEvent(thread));
         toTarget(thread).isolateThread = WordFactory.nullPointer();
@@ -439,7 +439,7 @@ public abstract class JavaThreads {
     }
 
     /** Have each thread, except this one, tear itself down. */
-    private static boolean tearDownJavaThreads() {
+    private static boolean tearDownPlatformThreads() {
         final Log trace = Log.noopLog().string("[JavaThreads.tearDownIsolateThreads:").newline().flush();
 
         /*
@@ -579,7 +579,7 @@ public abstract class JavaThreads {
     @SuppressFBWarnings(value = "Ru", justification = "We really want to call Thread.run and not Thread.start because we are in the low-level thread start routine")
     protected static void threadStartRoutine(ObjectHandle threadHandle) {
         Thread thread = ObjectHandles.getGlobal().get(threadHandle);
-        assignJavaThread(thread, false);
+        assignPlatformThread(thread, false);
         ObjectHandles.getGlobal().destroy(threadHandle);
 
         singleton().unattachedStartedThreads.decrementAndGet();
@@ -720,7 +720,7 @@ public abstract class JavaThreads {
         }
         tjlt.name = name;
 
-        final Thread parent = currentThread.get();
+        final Thread parent = platformThread.get();
         final ThreadGroup group = ((groupArg != null) ? groupArg : parent.getThreadGroup());
 
         int priority;
