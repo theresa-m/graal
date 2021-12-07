@@ -70,6 +70,9 @@ public final class Target_jdk_internal_misc_VM {
         return Target_jdk_internal_misc_VM.class.getClassLoader();
     }
 
+    @Alias
+    public static native Thread.State toThreadState(int threadStatus);
+
     @Substitute
     @NeverInline("Starting a stack walk in the caller frame")
     public static ClassLoader latestUserDefinedLoader0() {
