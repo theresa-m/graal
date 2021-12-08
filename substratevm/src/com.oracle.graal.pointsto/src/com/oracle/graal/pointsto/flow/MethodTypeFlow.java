@@ -87,7 +87,7 @@ public class MethodTypeFlow extends TypeFlow<AnalysisMethod> {
         List<StackTraceElement> parsingContext = new ArrayList<>();
         InvokeTypeFlow invokeFlow = parsingReason;
 
-        while (invokeFlow != null) {
+        while (invokeFlow != null && parsingContext.size() < 100) {
             parsingContext.add(invokeFlow.getSource().getMethod().asStackTraceElement(invokeFlow.getSource().getBCI()));
             invokeFlow = ((PointsToAnalysisMethod) invokeFlow.getSource().getMethod()).getTypeFlow().parsingReason;
         }
