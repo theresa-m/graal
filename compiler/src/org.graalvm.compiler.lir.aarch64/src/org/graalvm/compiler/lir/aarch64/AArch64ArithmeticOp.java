@@ -349,7 +349,10 @@ public enum AArch64ArithmeticOp {
                 default:
                     assert dstSize == 32 || dstSize == 64;
                     // inputs must have at least as many meaningful bits as the dst
-                    assert dstSize <= src1Size && dstSize <= src2Size;
+                    assert dstSize <= src1Size && dstSize <= src2Size : op +
+                                    ": dstSize=" + dstSize + " " + result.getPlatformKind() +
+                                    ", src1Size=" + src1Size + " " + a.getPlatformKind() +
+                                    ", src2Size=" + src2Size + " " + b.getPlatformKind();
                     break;
             }
             return true;
