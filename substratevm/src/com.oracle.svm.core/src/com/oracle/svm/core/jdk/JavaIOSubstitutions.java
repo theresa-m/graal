@@ -37,13 +37,6 @@ import com.oracle.svm.core.annotate.Substitute;
 import com.oracle.svm.core.annotate.TargetClass;
 import com.oracle.svm.core.hub.DynamicHub;
 
-@TargetClass(java.io.FileDescriptor.class)
-final class Target_java_io_FileDescriptor {
-
-    @Alias @RecomputeFieldValue(kind = Kind.Reset)//
-    private List<Closeable> otherParents;
-}
-
 @TargetClass(java.io.ObjectStreamClass.class)
 final class Target_java_io_ObjectStreamClass {
 
