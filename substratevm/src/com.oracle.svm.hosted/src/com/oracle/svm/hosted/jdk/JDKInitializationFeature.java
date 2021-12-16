@@ -146,6 +146,7 @@ public class JDKInitializationFeature implements Feature {
         rci.rerunInitialization("jdk.internal.misc.InnocuousThread", "Contains a thread group INNOCUOUSTHREADGROUP.");
 
         // IODH replacements
-        rci.rerunInitialization("java.io.FileDescriptor$RuntimeResetHelper", "Reset List<Closeable> otherParents at runtime");
+        rci.rerunInitialization("java.io.FileDescriptor$RuntimeResetHelper", "Reset List<Closeable> otherParents");
+        rci.rerunInitialization("jdk.internal.loader.URLClassPath$RuntimeResetHelper", "Reset fields that can store a Zip file");
     }
 }
