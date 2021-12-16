@@ -46,18 +46,6 @@ final class Target_java_io_ObjectStreamClass {
     }
 }
 
-@TargetClass(value = java.io.ObjectStreamClass.class, innerClass = "Caches")
-final class Target_java_io_ObjectStreamClass_Caches {
-
-    @Alias @RecomputeFieldValue(kind = Kind.NewInstance, declClass = ConcurrentHashMap.class) static ConcurrentMap<?, ?> localDescs;
-
-    @Alias @RecomputeFieldValue(kind = Kind.NewInstance, declClass = ConcurrentHashMap.class) static ConcurrentMap<?, ?> reflectors;
-
-    @Alias @RecomputeFieldValue(kind = Kind.NewInstance, declClass = ReferenceQueue.class) private static ReferenceQueue<Class<?>> localDescsQueue;
-
-    @Alias @RecomputeFieldValue(kind = Kind.NewInstance, declClass = ReferenceQueue.class) private static ReferenceQueue<Class<?>> reflectorsQueue;
-}
-
 /** Dummy class to have a class with the file's name. */
 public final class JavaIOSubstitutions {
 }
