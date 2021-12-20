@@ -69,19 +69,6 @@ public final class Target_java_lang_ClassLoader {
     @Alias private Target_java_lang_ClassLoader parent;
 
     /**
-     * This field can be safely deleted, but that would require substituting the entire constructor
-     * of ClassLoader, so we just reset it. The original javadoc mentions: "The classes loaded by
-     * this class loader. The only purpose of this table is to keep the classes from being GC'ed
-     * until the loader is GC'ed". This field is only accessed by ClassLoader.addClass() which is "
-     * invoked by the VM to record every loaded class with this loader".
-     */
-    @Alias @RecomputeFieldValue(kind = Kind.Reset)//
-    private Vector<Class<?>> classes;
-
-    @Alias @RecomputeFieldValue(kind = Kind.Reset)//
-    private ConcurrentHashMap<String, Object> parallelLockMap;
-
-    /**
      * Recompute ClassLoader.packages; See {@link ClassLoaderSupport} for explanation on why this
      * information must be reset.
      */
