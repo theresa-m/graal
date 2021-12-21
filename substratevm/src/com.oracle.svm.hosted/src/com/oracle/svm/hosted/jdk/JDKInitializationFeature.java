@@ -149,7 +149,17 @@ public class JDKInitializationFeature implements Feature {
         rci.rerunInitialization("java.io.FileDescriptor$RuntimeHelper", "Reset List<Closeable> otherParents, FileDescriptor (except in/out/err) cannot be persisted in the image heap.");
         rci.rerunInitialization("java.io.ObjectStreamClass$Caches$RuntimeHelper", "Reset cache fields");
         rci.rerunInitialization("jdk.internal.loader.URLClassPath$RuntimeHelper", "Reset fields that can store a Zip file via sun.misc.URLClassPath$JarLoader.jar.");
-        rci.rerunInitialization("java.net.URLClassLoader$RuntimeHelper", "");
-        rci.rerunInitialization("java.lang.ClassLoader$RuntimeHelper", "");
+        rci.rerunInitialization("java.net.URLClassLoader$RuntimeHelper", "Tracks JarFiles or FileInputStream which cannot be persisted.");
+        rci.rerunInitialization("java.lang.ClassLoader$RuntimeHelper", "Reset fields that cannot be persisted or will not be needed during runtime.");
+        rci.rerunInitialization("java.util.AbstractMap$RuntimeHelper", "Cache fields are not needed in heap, can easily be recomputed.");
+        rci.rerunInitialization("java.util.Collections$RuntimeHelper", "Cache fields are not needed in heap, can easily be recomputed.");
+        rci.rerunInitialization("java.util.EnumMap$RuntimeHelper", "Cache fields are not needed in heap, can easily be recomputed.");
+        rci.rerunInitialization("java.util.HashMap$RuntimeHelper", "Cache fields are not needed in heap, can easily be recomputed.");
+        rci.rerunInitialization("java.util.Hashtable$RuntimeHelper", "Cache fields are not needed in heap, can easily be recomputed.");
+        rci.rerunInitialization("java.util.IdentityHashMap$RuntimeHelper", "Cache fields are not needed in heap, can easily be recomputed.");
+        rci.rerunInitialization("java.util.TreeMap$RuntimeHelper", "Cache fields are not needed in heap, can easily be recomputed.");
+        rci.rerunInitialization("java.util.WeakHashMap$RuntimeHelper", "Cache fields are not needed in heap, can easily be recomputed.");
+        rci.rerunInitialization("java.util.concurrent.ConcurrentHashMap$RuntimeHelper", "Cache fields are not needed in heap, can easily be recomputed.");
+        rci.rerunInitialization("java.util.concurrent.ConcurrentSkipListMap$RuntimeHelper", "Cache fields are not needed in heap, can easily be recomputed.");
     }
 }

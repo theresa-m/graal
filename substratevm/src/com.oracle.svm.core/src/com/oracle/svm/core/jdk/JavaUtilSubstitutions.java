@@ -51,100 +51,8 @@ import com.oracle.svm.core.util.VMError;
  * writing can report errors about new objects spuriously appearing.
  */
 
-@TargetClass(java.util.AbstractMap.class)
-final class Target_java_util_AbstractMap {
-
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Set<?> keySet;
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Collection<?> values;
-}
-
-@TargetClass(value = java.util.Collections.class, innerClass = "UnmodifiableMap")
-final class Target_java_util_Collections_UnmodifiableMap {
-
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Set<?> keySet;
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Set<?> entrySet;
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Collection<?> values;
-}
-
-@TargetClass(value = java.util.Collections.class, innerClass = "SynchronizedMap")
-final class Target_java_util_Collections_SynchronizedMap {
-
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Set<?> keySet;
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Set<?> entrySet;
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Collection<?> values;
-}
-
-@TargetClass(java.util.EnumMap.class)
-final class Target_java_util_EnumMap {
-
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Set<?> entrySet;
-}
-
-@TargetClass(java.util.IdentityHashMap.class)
-final class Target_java_util_IdentityHashMap {
-
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Set<?> entrySet;
-}
-
-@TargetClass(className = "sun.misc.SoftCache", onlyWith = JDK8OrEarlier.class)
-final class Target_sun_misc_SoftCache {
-
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Set<?> entrySet;
-}
-
-@TargetClass(java.util.WeakHashMap.class)
-final class Target_java_util_WeakHashMap {
-
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Set<?> entrySet;
-}
-
-@TargetClass(java.util.Hashtable.class)
-final class Target_java_util_Hashtable {
-
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Set<?> keySet;
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Set<?> entrySet;
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Collection<?> values;
-}
-
-@TargetClass(java.util.TreeMap.class)
-final class Target_java_util_TreeMap {
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Target_java_util_TreeMap_EntrySet entrySet;
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Target_java_util_TreeMap_KeySet navigableKeySet;
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    NavigableMap<?, ?> descendingMap;
-}
-
-@TargetClass(value = java.util.TreeMap.class, innerClass = "EntrySet")
-final class Target_java_util_TreeMap_EntrySet {
-}
-
-@TargetClass(value = java.util.TreeMap.class, innerClass = "KeySet")
-final class Target_java_util_TreeMap_KeySet {
-}
-
 @TargetClass(java.util.HashMap.class)
 final class Target_java_util_HashMap {
-
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Set<?> entrySet;
-
     @Substitute
     private static Class<?> comparableClassFor(Object x) {
         if (x instanceof Comparable) {
@@ -160,14 +68,6 @@ final class Target_java_util_HashMap {
 
 @TargetClass(java.util.concurrent.ConcurrentHashMap.class)
 final class Target_java_util_concurrent_ConcurrentHashMap {
-
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Target_java_util_concurrent_ConcurrentHashMap_KeySetView keySet;
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Target_java_util_concurrent_ConcurrentHashMap_ValuesView values;
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Target_java_util_concurrent_ConcurrentHashMap_EntrySetView entrySet;
-
     @Substitute
     private static Class<?> comparableClassFor(Object x) {
         if (x instanceof Comparable) {
@@ -179,55 +79,6 @@ final class Target_java_util_concurrent_ConcurrentHashMap {
         }
         return null;
     }
-}
-
-@TargetClass(value = java.util.concurrent.ConcurrentHashMap.class, innerClass = "KeySetView")
-final class Target_java_util_concurrent_ConcurrentHashMap_KeySetView {
-}
-
-@TargetClass(value = java.util.concurrent.ConcurrentHashMap.class, innerClass = "ValuesView")
-final class Target_java_util_concurrent_ConcurrentHashMap_ValuesView {
-}
-
-@TargetClass(value = java.util.concurrent.ConcurrentHashMap.class, innerClass = "EntrySetView")
-final class Target_java_util_concurrent_ConcurrentHashMap_EntrySetView {
-}
-
-@TargetClass(java.util.concurrent.ConcurrentSkipListMap.class)
-final class Target_java_util_concurrent_ConcurrentSkipListMap {
-
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Target_java_util_concurrent_ConcurrentSkipListMap_KeySet keySet;
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Target_java_util_concurrent_ConcurrentSkipListMap_EntrySet entrySet;
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Target_java_util_concurrent_ConcurrentSkipListMap_Values values;
-
-    @Alias //
-    @TargetElement(name = "descendingMap", onlyWith = JDK8OrEarlier.class) //
-    @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    ConcurrentNavigableMap<?, ?> descendingMapJDK8OrEarlier;
-
-    @Alias //
-    @TargetElement(name = "descendingMap", onlyWith = JDK11OrLater.class) //
-    @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset)//
-    Target_java_util_concurrent_ConcurrentSkipListMap_SubMap descendingMapJDK11OrLater;
-}
-
-@TargetClass(value = java.util.concurrent.ConcurrentSkipListMap.class, innerClass = "KeySet")
-final class Target_java_util_concurrent_ConcurrentSkipListMap_KeySet {
-}
-
-@TargetClass(value = java.util.concurrent.ConcurrentSkipListMap.class, innerClass = "EntrySet")
-final class Target_java_util_concurrent_ConcurrentSkipListMap_EntrySet {
-}
-
-@TargetClass(value = java.util.concurrent.ConcurrentSkipListMap.class, innerClass = "SubMap", onlyWith = JDK11OrLater.class)
-final class Target_java_util_concurrent_ConcurrentSkipListMap_SubMap {
-}
-
-@TargetClass(value = java.util.concurrent.ConcurrentSkipListMap.class, innerClass = "Values")
-final class Target_java_util_concurrent_ConcurrentSkipListMap_Values {
 }
 
 @TargetClass(java.util.Currency.class)
