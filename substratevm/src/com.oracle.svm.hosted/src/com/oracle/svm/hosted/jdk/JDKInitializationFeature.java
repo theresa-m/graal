@@ -161,5 +161,7 @@ public class JDKInitializationFeature implements Feature {
         rci.rerunInitialization("java.util.WeakHashMap$RuntimeHelper", "Cache fields are not needed in heap, can easily be recomputed.");
         rci.rerunInitialization("java.util.concurrent.ConcurrentHashMap$RuntimeHelper", "Cache fields are not needed in heap, can easily be recomputed.");
         rci.rerunInitialization("java.util.concurrent.ConcurrentSkipListMap$RuntimeHelper", "Cache fields are not needed in heap, can easily be recomputed.");
+        rci.rerunInitialization("java.io.UnixFileSystem$RuntimeHelper", "");
+        rci.rerunInitialization("java.io.WinNTFileSystem$RuntimeHelper", "");
     }
 }

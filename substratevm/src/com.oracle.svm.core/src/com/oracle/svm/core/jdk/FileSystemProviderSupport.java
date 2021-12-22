@@ -403,9 +403,6 @@ final class Target_java_io_UnixFileSystem {
     @TargetElement(onlyWith = JDK11OrLater.class)//
     private String userDir;
 
-    @Alias @RecomputeFieldValue(kind = Kind.NewInstance, declClassName = "java.io.ExpiringCache") //
-    private Target_java_io_ExpiringCache cache;
-
     /*
      * The prefix cache on Linux/MacOS only caches elements in the Java home directory, which does
      * not exist at image runtime. So we disable that cache completely, which is done by
@@ -413,12 +410,6 @@ final class Target_java_io_UnixFileSystem {
      */
     @Delete //
     private String javaHome;
-    /*
-     * Ideally, we would mark this field as @Delete too. However, the javaHomePrefixCache is cleared
-     * from various methods, and we do not want to change those methods.
-     */
-    @Alias @RecomputeFieldValue(kind = Kind.NewInstance, declClassName = "java.io.ExpiringCache") //
-    private Target_java_io_ExpiringCache javaHomePrefixCache;
 }
 
 @TargetClass(className = "java.io.FileSystem")
@@ -452,18 +443,7 @@ class UserDirAccessors {
 @TargetClass(className = "java.io.WinNTFileSystem")
 @Platforms(Platform.WINDOWS.class)
 final class Target_java_io_WinNTFileSystem {
-
     @Alias @InjectAccessors(UserDirAccessors.class) //
     @TargetElement(onlyWith = JDK11OrLater.class) //
     private String userDir;
-
-    @Alias @RecomputeFieldValue(kind = Kind.NewInstance, declClassName = "java.io.ExpiringCache") //
-    private Target_java_io_ExpiringCache cache;
-
-    @Alias @RecomputeFieldValue(kind = Kind.NewInstance, declClassName = "java.io.ExpiringCache") //
-    private Target_java_io_ExpiringCache prefixCache;
-}
-
-@TargetClass(className = "java.io.ExpiringCache")
-final class Target_java_io_ExpiringCache {
 }
