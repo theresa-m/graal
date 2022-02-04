@@ -147,5 +147,6 @@ public class JDKInitializationFeature implements Feature {
         
         // iodh replacements
         rci.rerunInitialization("java.nio.Bits$RuntimeHelper", "");
+        rci.rerunInitialization("java.io.ObjectStreamClass$Caches$RuntimeHelper", "");
     }
 }
