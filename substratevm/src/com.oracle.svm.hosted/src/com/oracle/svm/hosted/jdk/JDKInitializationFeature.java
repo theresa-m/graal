@@ -144,5 +144,8 @@ public class JDKInitializationFeature implements Feature {
         rci.rerunInitialization("java.lang.StrictMath$RandomNumberGeneratorHolder", "Contains random seeds");
 
         rci.rerunInitialization("jdk.internal.misc.InnocuousThread", "Contains a thread group INNOCUOUSTHREADGROUP.");
+        
+        // iodh replacements
+        rci.rerunInitialization("java.nio.Bits$RuntimeHelper", "");
     }
 }

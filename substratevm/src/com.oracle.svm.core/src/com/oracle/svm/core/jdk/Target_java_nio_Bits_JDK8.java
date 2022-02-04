@@ -65,27 +65,3 @@ final class Target_java_nio_Bits_JDK8 {
     @Alias @RecomputeFieldValue(kind = Kind.FromAlias) //
     private static AtomicLong count = new AtomicLong();
 }
-
-/* Fields changed names between JDK 8 and 11. */
-@TargetClass(className = "java.nio.Bits", onlyWith = JDK11OrLater.class)
-final class Target_java_nio_Bits_JDK11 {
-
-    // Checkstyle: stop
-
-    @Alias @RecomputeFieldValue(kind = Kind.FromAlias) //
-    private static int PAGE_SIZE = -1;
-
-    @Alias @RecomputeFieldValue(kind = Kind.FromAlias) //
-    private static boolean MEMORY_LIMIT_SET = false;
-    @Alias @RecomputeFieldValue(kind = Kind.FromAlias) //
-    private static long MAX_MEMORY = -1;
-
-    @Alias @RecomputeFieldValue(kind = Kind.FromAlias) //
-    private static AtomicLong RESERVED_MEMORY = new AtomicLong();
-    @Alias @RecomputeFieldValue(kind = Kind.FromAlias) //
-    private static AtomicLong TOTAL_CAPACITY = new AtomicLong();
-    @Alias @RecomputeFieldValue(kind = Kind.FromAlias) //
-    private static AtomicLong COUNT = new AtomicLong();
-
-    // Checkstyle: resume
-}
