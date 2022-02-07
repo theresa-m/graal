@@ -230,13 +230,6 @@ final class Target_java_util_concurrent_ConcurrentSkipListMap_SubMap {
 final class Target_java_util_concurrent_ConcurrentSkipListMap_Values {
 }
 
-@TargetClass(java.util.Currency.class)
-final class Target_java_util_Currency {
-    @Alias//
-    @RecomputeFieldValue(kind = Kind.NewInstance, declClass = ConcurrentHashMap.class)//
-    private static ConcurrentMap<String, Currency> instances;
-}
-
 /**
  * During LogManager initialization a shutdown hook is added to close all handlers. However, this
  * shutdown hook is lost for native-image because (i) all hooks are reinitialized within the image
