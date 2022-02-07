@@ -44,19 +44,6 @@ import java.util.WeakHashMap;
 @TargetClass(classNameProvider = Package_jdk_internal_loader.class, className = "URLClassPath")
 @SuppressWarnings({"unused", "static-method"})
 final class Target_jdk_internal_loader_URLClassPath {
-
-    /* Reset fields that can store a Zip file via sun.misc.URLClassPath$JarLoader.jar. */
-
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.NewInstance, declClass = ArrayList.class)//
-    private ArrayList<?> loaders;
-
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.NewInstance, declClass = HashMap.class)//
-    private HashMap<String, ?> lmap;
-
-    /* The original locations of the .jar files are no longer available at run time. */
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.NewInstance, declClass = ArrayList.class)//
-    private ArrayList<URL> path;
-
     /*
      * We are defensive and also handle private native methods by marking them as deleted. If they
      * are reachable, the user is certainly doing something wrong. But we do not want to fail with a
