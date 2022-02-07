@@ -150,5 +150,6 @@ public class JDKInitializationFeature implements Feature {
         rci.rerunInitialization("java.io.ObjectStreamClass$Caches$RuntimeHelper", "");
         rci.rerunInitialization("jdk.internal.loader.URLClassPath$RuntimeHelper", "");
         rci.rerunInitialization("java.net.URLClassLoader$RuntimeHelper", "");
+        rci.rerunInitialization("java.lang.ClassLoader$RuntimeHelper", "");
     }
 }
