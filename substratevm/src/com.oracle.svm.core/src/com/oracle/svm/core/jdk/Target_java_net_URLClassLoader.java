@@ -98,10 +98,6 @@ final class Target_jdk_internal_loader_URLClassPath {
 @TargetClass(URLClassLoader.class)
 @SuppressWarnings({"unused", "static-method"})
 final class Target_java_net_URLClassLoader {
-    @Alias//
-    @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.NewInstance, declClass = WeakHashMap.class)//
-    private WeakHashMap<Closeable, Void> closeables;
-
     @Substitute
     public InputStream getResourceAsStream(String name) throws IOException {
         return Resources.createInputStream(name);
