@@ -152,7 +152,7 @@ public class JDKInitializationFeature implements Feature {
         rci.rerunInitialization("java.net.URLClassLoader$RuntimeHelper", "");
         rci.rerunInitialization("java.lang.ClassLoader$RuntimeHelper", "");
         rci.rerunInitialization("java.util.Concurrency$RuntimeHelper", "");
-        rci.rerunInitialization("java.io.WinNTFileSystem", "");
         rci.rerunInitialization("java.util.UnixFileSystem$RuntimeHelper", "");
+        rci.rerunInitialization("java.io.WinNTFileSystem$RuntimeHelper", "");
     }
 }

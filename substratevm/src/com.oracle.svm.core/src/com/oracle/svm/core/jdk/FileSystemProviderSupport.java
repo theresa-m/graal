@@ -447,12 +447,6 @@ final class Target_java_io_WinNTFileSystem {
     @Alias @InjectAccessors(UserDirAccessors.class) //
     @TargetElement(onlyWith = JDK11OrLater.class) //
     private String userDir;
-
-    @Alias @RecomputeFieldValue(kind = Kind.NewInstance, declClassName = "java.io.ExpiringCache") //
-    private Target_java_io_ExpiringCache cache;
-
-    @Alias @RecomputeFieldValue(kind = Kind.NewInstance, declClassName = "java.io.ExpiringCache") //
-    private Target_java_io_ExpiringCache prefixCache;
 }
 
 @TargetClass(className = "java.io.ExpiringCache")
