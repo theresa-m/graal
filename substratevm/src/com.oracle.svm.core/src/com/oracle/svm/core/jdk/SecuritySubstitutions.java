@@ -632,14 +632,6 @@ final class Target_sun_security_jca_ProviderConfig {
     }
 }
 
-@SuppressWarnings("unused")
-@TargetClass(className = "sun.security.jca.ProviderConfig", innerClass = "ProviderLoader", onlyWith = JDK11OrLater.class)
-final class Target_sun_security_jca_ProviderConfig_ProviderLoader {
-    @Alias//
-    @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.NewInstance, isFinal = true)//
-    static Target_sun_security_jca_ProviderConfig_ProviderLoader INSTANCE;
-}
-
 /**
  * This only applies to JDK8 and JDK11. Experimental FIPS mode in the SunJSSE Provider was removed
  * in JDK-8217835. Going forward it is recommended to configure FIPS 140 compliant cryptography
