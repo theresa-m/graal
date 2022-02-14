@@ -78,9 +78,6 @@ import com.oracle.svm.core.util.VMError;
 @TargetClass(java.util.TimeZone.class)
 @SuppressWarnings("unused")
 final class Target_java_util_TimeZone {
-
-    @Alias @RecomputeFieldValue(kind = RecomputeFieldValue.Kind.Reset) private static TimeZone defaultTimeZone;
-
     @Substitute
     private static String getSystemTimeZoneID(String javaHome) {
         CCharPointer tzMappingsPtr = WordFactory.nullPointer();

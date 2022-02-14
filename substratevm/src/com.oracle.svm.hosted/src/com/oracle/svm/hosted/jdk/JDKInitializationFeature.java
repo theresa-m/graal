@@ -155,5 +155,6 @@ public class JDKInitializationFeature implements Feature {
         rci.rerunInitialization("java.util.UnixFileSystem$RuntimeHelper", "");
         rci.rerunInitialization("java.io.WinNTFileSystem$RuntimeHelper", "");
         rci.rerunInitialization("jdk.internal.misc.VM$RuntimeHelper", "");
+        rci.rerunInitialization("java.util.TimeZone$RuntimeHelper", "");
     }
 }
