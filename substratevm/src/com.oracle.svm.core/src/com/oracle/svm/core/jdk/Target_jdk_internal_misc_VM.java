@@ -76,15 +76,6 @@ public final class Target_jdk_internal_misc_VM {
         return StackTraceUtils.latestUserDefinedClassLoader(KnownIntrinsics.readCallerStackPointer());
     }
 
-    /*
-     * Finalizers are not supported, but we still do not want to inherit any counters from the image
-     * builder.
-     */
-    @Alias @RecomputeFieldValue(kind = Kind.Reset) //
-    private static int finalRefCount;
-    @Alias @RecomputeFieldValue(kind = Kind.Reset) //
-    private static int peakFinalRefCount;
-
     @Alias @InjectAccessors(DirectMemoryAccessors.class) //
     private static long directMemory;
     @Alias @InjectAccessors(DirectMemoryAccessors.class) //
