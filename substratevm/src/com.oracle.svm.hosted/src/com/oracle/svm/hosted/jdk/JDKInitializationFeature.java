@@ -157,5 +157,6 @@ public class JDKInitializationFeature implements Feature {
         rci.rerunInitialization("jdk.internal.misc.VM$RuntimeHelper", "");
         rci.rerunInitialization("java.util.TimeZone$RuntimeHelper", "");
         rci.rerunInitialization("sun.security.jca.ProviderConfig$ProviderLoader$RuntimeHelper", "");
+        rci.rerunInitialization("java.time.zone.ZoneRules$RuntimeHelper", "");
     }
 }
